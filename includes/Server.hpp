@@ -5,7 +5,8 @@
 # include <poll.h> // poll()
 # include <netinet/in.h> // struct sockaddr
 # include <string.h> // memset
-# include <vector>
+# include <vector> // vector
+# include <cstdlib> // atoi
 class Server {
 
     private:
@@ -18,5 +19,5 @@ class Server {
         Server();
         ~Server();
 
-    void    runServer();
+    void    runServer(int port);
 };
