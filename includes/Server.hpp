@@ -4,6 +4,7 @@
 # include <unistd.h> // close()
 # include <poll.h> // poll()
 # include <netinet/in.h> // struct sockaddr
+# include <string.h> // memset
 class Server {
 
     private:
