@@ -6,7 +6,8 @@
 # include <netinet/in.h> // struct sockaddr
 # include <vector> // std::vector
 # include <cstring>// memset
-
+# include <vector> // vector
+# include <cstdlib> // atoi
 class Server {
 
     private:
@@ -19,5 +20,5 @@ class Server {
         Server();
         ~Server();
 
-    void    runServer();
+    void    runServer(int port);
 };

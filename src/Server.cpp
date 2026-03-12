@@ -1,15 +1,14 @@
-#include "Server.hpp"
-#include <string.h>
+#include "../includes/Server.hpp"
 
 Server::Server(){}
 Server::~Server()
 {
 	close(_socketFD);
 }
-void	Server::runServer()
+void	Server::runServer(int port)
 {
+	_port = port; //to change latter and put in the constructor
 	bool	running = true;
-	int		poll_return_value;		
 	struct	sockaddr_in	socketAddr;
 
 	std::memset(&socketAddr, 0, sizeof(socketAddr));
