@@ -4,8 +4,9 @@
 # include <unistd.h> // close()
 # include <poll.h> // poll()
 # include <netinet/in.h> // struct sockaddr
-# include <string.h> // memset
-# include <vector>
+# include <vector> // std::vector
+# include <cstring>// memset
+
 class Server {
 
     private:

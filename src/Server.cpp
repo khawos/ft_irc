@@ -12,7 +12,7 @@ void	Server::runServer()
 	int		poll_return_value;		
 	struct	sockaddr_in	socketAddr;
 
-	memset(&socketAddr, 0, sizeof(socketAddr));
+	std::memset(&socketAddr, 0, sizeof(socketAddr));
 	socketAddr.sin_family = AF_INET;
 	socketAddr.sin_port = htons(_port); // htons is for big endian standard imposed by TCP/IP
 	socketAddr.sin_addr.s_addr = INADDR_ANY;
