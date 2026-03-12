@@ -5,13 +5,14 @@
 # include <poll.h> // poll()
 # include <netinet/in.h> // struct sockaddr
 # include <string.h> // memset
+# include <vector>
 class Server {
 
     private:
 
         int _socketFD;
         int _port;
-    
+	    std::vector<pollfd> _pollFds;
     public:
 
         Server();
