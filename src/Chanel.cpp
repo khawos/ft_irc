@@ -9,7 +9,7 @@ void	Chanel::addUserInChannel( const User &newUser )
 	{
 		case 0:
 		{
-			_Users[ newUser.userName ] = newUser;			
+			_Users[ newUser.getUsername()] = newUser;			
 			break ;
 		}
 	}
@@ -17,7 +17,7 @@ void	Chanel::addUserInChannel( const User &newUser )
 
 void	Chanel::deleteUserFromChannel( const User &userToDelete )
 {
-	std::string	name = userToDelete.nickName;
+	std::string	name = userToDelete.getNickname();
 	try
 	{
 		_Users.at( name );

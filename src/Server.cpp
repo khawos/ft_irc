@@ -45,6 +45,8 @@ Server::~Server()
 		delete _users[i];
 }
 
+
+
 void	Server::runServer()
 {
 	bool	running = true;
@@ -65,19 +67,20 @@ void	Server::runServer()
 				}
 				else
 				{
-					char	buffer[1024];
-					int		bytes = recv(_pollFds[i].fd, buffer, 1023, 0); // catch data form the socket
-					if (bytes <= 0)
-					{
-						close(_pollFds[i].fd);
-						_pollFds.erase(_pollFds.begin() + i); // remove the socket
-						i--;
-					}
-					else
-					{
-						buffer[bytes] = '\0';
-						std::cout << buffer << std::endl;
-					}
+					handleUserData( i );
+					// char	buffer[1024];
+					// int		bytes = recv(_pollFds[i].fd, buffer, 1023, 0); // catch data form the socket
+					// if (bytes <= 0)
+					// {
+					// 	close(_pollFds[i].fd);
+					// 	_pollFds.erase(_pollFds.begin() + i); // remove the socket
+					// 	i--;
+					// }
+					// else
+					// {
+					// 	buffer[bytes] = '\0';
+					// 	std::cout << buffer << std::endl;
+					// }
 				}
 			}
 		}
@@ -88,7 +91,7 @@ void	Server::disconnectClient( int id )
 {
 	close( _pollFds[id].fd );
 	_pollFds.erase( _pollFds.begin() + id);
-	delete _users[id];
+	delete _users[id - 1];
 }
 
 void	Server::handleConnexion( std::vector<std::string> args, int id )
@@ -115,11 +118,42 @@ User	*Server::newUserConnexion( size_t i, int client_fd )
 {
 	std::cout << "New client connected!" << std::endl;
 	User *newUser = new User( i );
-	_users[ i ] = newUser;
 	fcntl( client_fd, O_NONBLOCK );
 	pollfd clientPoll;
 	clientPoll.fd = client_fd;
 	clientPoll.events = POLLIN;
 	_pollFds.push_back( clientPoll );
+	std::cout << "Client number " << i << " has been added to the server" << std::endl;
 	return ( newUser );
+}
+
+void	Server::handleUserData(size_t pollIndex)
+{
+	int		fd = _pollFds[pollIndex].fd;
+	char	buffer[1024];
+
+	int	bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	buffer[bytes] = '\0';
+	if (bytes <= 0)
+	{
+		std::cout << "Client number " << pollIndex - 1 << " has been disconected form the server" << std::endl;
+		disconnectClient(pollIndex);
+		return;
+	}
+
+	User *user = _users[pollIndex - 1];
+	if (!user)
+	{
+		std::cerr << "No user found for fd " << pollIndex << std::endl;
+		return;
+	}
+	user->appendToReadBuffer(std::string(buffer, bytes));
+	std::string	line;
+	while (user->extractCommand(line))
+	{
+		if (line.empty())
+			continue;
+		std::cout << "[RECV fd=" << fd << "] " << line << std::endl;
+		processCommand(*client, line);
+	}
 }
