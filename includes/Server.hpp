@@ -9,24 +9,28 @@
 # include <cstring>// memset
 # include <vector> // vector
 # include <cstdlib> // atoi
-# include "../includes/User.hpp" // User Class
+# include "../includes/User.hpp" // User Class - std::string
 # include <map> // std::map
 
 class Server {
 
 	private:
 
-		int _socketFD;
-		int _port;
-		std::vector<pollfd> _pollFds;
-		std::map<unsigned int, User *> _users;
-		unsigned int	_id;
+		int								_socketFD;
+		int								_port;
+		std::vector<pollfd>				_pollFds;
+		std::map<unsigned int, User *>	_users;
+		unsigned int					_id;
+		std::string						_password;
 		
 	public:
 
 		Server();
-		Server( int, int & );
+		Server( int, int &, std::string );
 		~Server();
 		User	*newUserConnexion( size_t i, int client_fd );
 		void    runServer();
+		void	handleCommand( std::string, std::vector<std::string>, int );
+		void	handleConnexion( std::vector<std::string> args, int id );
+		void	disconnectClient( int id );
 };

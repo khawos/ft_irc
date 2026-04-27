@@ -6,7 +6,7 @@ OBJ_DIR = obj
 
 SRC := $(shell find src -maxdepth 1 -name '*.cpp')
 OBJ := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
-TARGET = ft_irc
+TARGET = ircserv
 
 all: $(TARGET)
 

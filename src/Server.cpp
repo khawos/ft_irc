@@ -1,6 +1,6 @@
 #include "../includes/Server.hpp"
 
-Server::Server( int port, int &flag ) : _id(0)
+Server::Server( int port, int &flag, std::string password ) : _id(0), _password(password)
 {
 	_port = port; //to change latter and put in the constructor
 	struct	sockaddr_in	socketAddr;
@@ -38,16 +38,11 @@ Server::Server( int port, int &flag ) : _id(0)
 
 Server::~Server()
 {
-
 	close( _socketFD );
 	for ( std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++ )
-	{
 		close( it->fd );
-	}
 	for ( size_t i = _users.size(); i != 0; i-- )
-	{
 		delete _users[i];
-	}
 }
 
 void	Server::runServer()
@@ -89,14 +84,42 @@ void	Server::runServer()
 	}	
 }
 
+void	Server::disconnectClient( int id )
+{
+	close( _pollFds[id].fd );
+	_pollFds.erase( _pollFds.begin() + id);
+	delete _users[id];
+}
+
+void	Server::handleConnexion( std::vector<std::string> args, int id )
+{
+	if ( args[0] != _password )
+	{
+		disconnectClient( id );
+		std::cout << "Wrong password try again" << std::endl;
+	}
+	else
+		std::cout << "Successfuly connected" << std::endl;
+}
+
+void	Server::handleCommand( std::string cmd, std::vector<std::string> args, int id )
+{
+	std::cout << " cmd : " << cmd << std::endl;
+	if ( cmd == "PASS" )
+	{
+		handleConnexion( args, id );
+	}
+}
+
 User	*Server::newUserConnexion( size_t i, int client_fd )
 {
 	std::cout << "New client connected!" << std::endl;
-	User *newUser = new User(i);
+	User *newUser = new User( i );
 	_users[ i ] = newUser;
 	fcntl( client_fd, O_NONBLOCK );
 	pollfd clientPoll;
 	clientPoll.fd = client_fd;
 	clientPoll.events = POLLIN;
-	_pollFds.push_back(clientPoll);
+	_pollFds.push_back( clientPoll );
+	return ( newUser );
 }
