@@ -1,73 +1,77 @@
 #include "../includes/Server.hpp"
 
-Server::Server(){}
-Server::~Server()
-{
-	close(_socketFD);
-}
-void	Server::runServer(int port)
+Server::Server( int port, int &flag ) : _id(0)
 {
 	_port = port; //to change latter and put in the constructor
-	bool	running = true;
 	struct	sockaddr_in	socketAddr;
-
 	std::memset(&socketAddr, 0, sizeof(socketAddr));
 	socketAddr.sin_family = AF_INET;
-	socketAddr.sin_port = htons(_port); // htons is for big endian standard imposed by TCP/IP
+	socketAddr.sin_port = htons(_port); 		// htons is for big endian standard imposed by TCP/IP
 	socketAddr.sin_addr.s_addr = INADDR_ANY;
-
 	_socketFD = socket(AF_INET, SOCK_STREAM, 0); // create a socket
 	if (_socketFD == -1)
 	{
 		std::cerr << "(Server Socket) Socket initialization failed." << std::endl;
+		flag = -1;
 		return ;
 	}
-
 	int	bind_return_value = bind( _socketFD, ( const sockaddr *) &socketAddr, sizeof(socketAddr)); // bind the socket to the port
 	if ( bind_return_value == -1 )
 	{
 		std::cerr << "(Server Socket) Bind failed to set port " << _port << " as active listening" << std::endl;
+		flag = -1;
 		return ;
 	}
-
-	int	listen_return_value = listen( _socketFD, 1024 ); // start leastening for incoming connections
+	int	listen_return_value = listen( _socketFD, port ); // start leastening for incoming connections
 	if (listen_return_value == -1)
 	{
 		std::cerr << "(Server Socket) Listen failed to mark _socketFD." << std::endl;
+		flag = -1;
 		return ;
 	}
 	pollfd serverPoll;
 	serverPoll.fd = _socketFD;
 	serverPoll.events = POLLIN;
 	_pollFds.push_back(serverPoll);
-	
-	while (running)
+	return ;
+}
+
+Server::~Server()
+{
+
+	close( _socketFD );
+	for ( std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++ )
 	{
-		poll(_pollFds.data(), _pollFds.size(), -1);	// check all the socket at the same time
-	
-		for (size_t i = 0; i < _pollFds.size(); i++)
+		close( it->fd );
+	}
+	for ( size_t i = _users.size(); i != 0; i-- )
+	{
+		delete _users[i];
+	}
+}
+
+void	Server::runServer()
+{
+	bool	running = true;
+	while ( running )
+	{
+		poll( _pollFds.data(), _pollFds.size(), -1 );				// check all the socket at the same time
+		for (size_t i = 0; i < _pollFds.size(); i++)				// on boucle sur tous les sockets
 		{
-			if (_pollFds[i].revents & POLLIN)
+			if ( _pollFds[i].revents & POLLIN )						// on regarde si il y a de la data a lire
 			{
-				if (_pollFds[i].fd == _socketFD)
+				if (_pollFds[i].fd == _socketFD)					// est ce que c'est le socket pour se connecter au serveur ?
 				{
-					int client_fd = accept(_socketFD, NULL, NULL);
+					int client_fd = accept(_socketFD, NULL, NULL);	// ouvre un socket pour la connection entrente
 					if (client_fd != -1)
-					{
-						std::cout << "New client connected!" << std::endl;
-						pollfd clientPoll;
-						clientPoll.fd = client_fd;
-						clientPoll.events = POLLIN;
-						_pollFds.push_back(clientPoll);
-					}
+						_users[ i ] = newUserConnexion( i, client_fd );
 					else
-						std::cerr << "Accept faild" << std::endl;
+						std::cerr << "Accept failed" << std::endl;
 				}
 				else
 				{
 					char	buffer[1024];
 					int		bytes = recv(_pollFds[i].fd, buffer, 1023, 0); // catch data form the socket
-
 					if (bytes <= 0)
 					{
 						close(_pollFds[i].fd);
@@ -83,4 +87,16 @@ void	Server::runServer(int port)
 			}
 		}
 	}	
+}
+
+User	*Server::newUserConnexion( size_t i, int client_fd )
+{
+	std::cout << "New client connected!" << std::endl;
+	User *newUser = new User(i);
+	_users[ i ] = newUser;
+	fcntl( client_fd, O_NONBLOCK );
+	pollfd clientPoll;
+	clientPoll.fd = client_fd;
+	clientPoll.events = POLLIN;
+	_pollFds.push_back(clientPoll);
 }

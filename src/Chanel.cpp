@@ -1,5 +1,5 @@
-#include "Chanel.hpp"
-#
+#include "../includes/Chanel.hpp"
+
 Chanel::Chanel(){}
 Chanel::~Chanel(){}
 
@@ -9,7 +9,7 @@ void	Chanel::addUserInChannel( const User &newUser )
 	{
 		case 0:
 		{
-			_Users.insert( {newUser.nickName, newUser} );
+			_Users[ newUser.userName ] = newUser;			
 			break ;
 		}
 	}
