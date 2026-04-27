@@ -1,29 +1,38 @@
-CXX = c++
+NAME		= ircserv
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXX			= c++
+CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -g
 
-OBJ_DIR = obj
+SRCDIR		= src
+INCDIR		= includes
+OBJDIR		= objs
 
-SRC := $(shell find src -maxdepth 1 -name '*.cpp')
-OBJ := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
-TARGET = ft_irc
+SRCS		= main.cpp \
+			  Server.cpp \
+			  Client.cpp \
+			  Command.cpp \
+			  commands/pass.cpp \
+			  commands/nick.cpp \
+			  commands/user.cpp \
+			  commands/ping.cpp \
+			  commands/quit.cpp
 
-all: $(TARGET)
+OBJS		= $(SRCS:%.cpp=$(OBJDIR)/%.o)
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+all: $(NAME)
 
-$(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(OBJDIR)
 
 fclean: clean
-	rm -f $(TARGET)
+	rm -f $(NAME)
 
 re: fclean all
 
