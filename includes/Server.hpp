@@ -34,4 +34,5 @@ class Server {
 		void	handleConnexion( std::vector<std::string> args, int id );
 		void	disconnectClient( int id );
 		void	handleUserData(size_t pollIndex);
+		void	processCommand(User& client, const std::string& line);
 };

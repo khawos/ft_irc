@@ -1,4 +1,5 @@
 #include "../includes/Server.hpp"
+#include "../includes/Command.hpp"
 
 Server::Server( int port, int &flag, std::string password ) : _id(0), _password(password)
 {
@@ -155,5 +156,52 @@ void	Server::handleUserData(size_t pollIndex)
 			continue;
 		std::cout << "[RECV fd=" << fd << "] " << line << std::endl;
 		processCommand(*client, line);
+	}
+}
+
+
+
+void	Server::processCommand(User& client, const std::string& line)
+{
+	Command	cmd = parseCommand(line);
+	if (cmd.name.empty())
+		return;
+
+	// Debug print
+	std::cout << "[PARSED] name=" << cmd.name << " params=";
+	for (size_t i = 0; i < cmd.params.size(); i++)
+		std::cout << "[" << cmd.params[i] << "] ";
+	std::cout << std::endl;
+
+	// Dispatcher
+	if (cmd.name == "PASS")
+		handlePass(client, cmd);
+	else if (cmd.name == "NICK")
+		handleNick(client, cmd);
+	else if (cmd.name == "USER")
+		handleUser(client, cmd);
+	else if (cmd.name == "PING")
+		handlePing(client, cmd);
+	else if (cmd.name == "QUIT")
+		handleQuit(client, cmd);
+	else if (cmd.name == "CAP")
+	{
+		// Minimal CAP handling for clients like HexChat
+		if (!cmd.params.empty() && cmd.params[0] == "LS")
+			sendToClient(client, ":server CAP * LS :\r\n");
+		// LIST / REQ / END: silently ignored
+	}
+	else
+	{
+		// Not registered yet — many commands are blocked
+		if (!client.isRegistered())
+		{
+			std::string nick = client.getNickname().empty() ? "*" : client.getNickname();
+			sendToClient(client, ":server 451 " + nick + " :You have not registered\r\n");
+		}
+		else
+		{
+			sendToClient(client, ":server 421 " + client.getNickname() + " " + cmd.name + " :Unknown command\r\n");
+		}
 	}
 }
