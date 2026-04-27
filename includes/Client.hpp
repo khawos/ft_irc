@@ -1,10 +1,10 @@
 #pragma once
 # include <string> // std::string
 
-class User {
+class Client {
 
     public :
 
         std::string nickName;
-        std::string userName;
+        std::string ClientName;
 };
