@@ -2,6 +2,7 @@
 
 void    Server::handlePass(User &client, Command cmd)
 {
+	std::cout << "SERVER: Handling PASS command for fd=" << client.getFd() << std::endl;
 	if (cmd.params.size() != 1)
 	{
 		send(_pollFds[client.getFd()].fd, "Use : PASS <password>\n", 23, 0);

@@ -192,10 +192,10 @@ void	Server::processCommand(User& client, const std::string& line)
 		send(_pollFds[client.getFd()].fd, "Enter the password : PASS <password>\n", 38, 0);
 		return ;
 	}
-// 	else if (cmd.name == "NICK")
-// 		handleNick(client, cmd);
-// 	else if (cmd.name == "USER")
-// 		handleUser(client, cmd);
+	// else if (cmd.name == "NICK")
+	// 	handleNick(client, cmd);
+	// else if (cmd.name == "USER")
+	// 	handleUser(client, cmd);
 // 	else if (cmd.name == "PING")
 // 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")
