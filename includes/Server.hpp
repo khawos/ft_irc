@@ -11,6 +11,7 @@
 # include <cstdlib> // atoi
 # include "../includes/User.hpp" // User Class - std::string
 # include <map> // std::map
+# include "../includes/Command.hpp" // struct Command
 
 class Server {
 
@@ -35,4 +36,5 @@ class Server {
 		void	disconnectClient( int id );
 		void	handleUserData(size_t pollIndex);
 		void	processCommand(User& client, const std::string& line);
+		void	handlePass(User &client, Command cmd);
 };

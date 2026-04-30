@@ -24,6 +24,7 @@ class User
         // Getters
 		int					getFd() const;
 		const std::string&	getNickname() const;
+		const unsigned int&	getId() const;
 		const std::string&	getUsername() const;
 		const std::string&	getRealname() const;
 		bool				isPassOk() const;
