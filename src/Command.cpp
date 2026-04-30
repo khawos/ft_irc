@@ -1,4 +1,4 @@
-#include "Command.hpp"
+#include "../includes/Command.hpp"
 #include <cctype>
 
 // Parse a raw IRC line into a Command struct.

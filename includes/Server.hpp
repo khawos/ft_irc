@@ -11,7 +11,7 @@
 # include <cstdlib> // atoi
 # include "../includes/User.hpp" // User Class - std::string
 # include <map> // std::map
-
+# include "../includes/Command.hpp" // Command struct - std::string, std::vector<std::string>
 class Server {
 
 	private:
@@ -34,5 +34,10 @@ class Server {
 		void	handleConnexion( std::vector<std::string> args, int id );
 		void	disconnectClient( int id );
 		void	handleUserData(size_t pollIndex);
-		void	processCommand(User& client, const std::string& line);
+		void	processCommand(User& user, const std::string& line);
+		void	handlePass(User& user, const Command& cmd);
+		void	handleNick(User& user, const Command& cmd);
+		void	handleUser(User& user, const Command& cmd);
+		void	handlePing(User& user, const Command& cmd);
+		void	handleQuit(User& user, const Command& cmd);
 };

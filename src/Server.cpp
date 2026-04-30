@@ -69,19 +69,6 @@ void	Server::runServer()
 				else
 				{
 					handleUserData( i );
-					// char	buffer[1024];
-					// int		bytes = recv(_pollFds[i].fd, buffer, 1023, 0); // catch data form the socket
-					// if (bytes <= 0)
-					// {
-					// 	close(_pollFds[i].fd);
-					// 	_pollFds.erase(_pollFds.begin() + i); // remove the socket
-					// 	i--;
-					// }
-					// else
-					// {
-					// 	buffer[bytes] = '\0';
-					// 	std::cout << buffer << std::endl;
-					// }
 				}
 			}
 		}
@@ -155,13 +142,13 @@ void	Server::handleUserData(size_t pollIndex)
 		if (line.empty())
 			continue;
 		std::cout << "[RECV fd=" << fd << "] " << line << std::endl;
-		processCommand(*client, line);
+		//processCommand(*user, line);
 	}
 }
 
 
 
-void	Server::processCommand(User& client, const std::string& line)
+void	Server::processCommand(User& user, const std::string& line)
 {
 	Command	cmd = parseCommand(line);
 	if (cmd.name.empty())
@@ -175,33 +162,33 @@ void	Server::processCommand(User& client, const std::string& line)
 
 	// Dispatcher
 	if (cmd.name == "PASS")
-		handlePass(client, cmd);
+		handlePass(user, cmd);
 	else if (cmd.name == "NICK")
-		handleNick(client, cmd);
+		handleNick(user, cmd);
 	else if (cmd.name == "USER")
-		handleUser(client, cmd);
+		handleUser(user, cmd);
 	else if (cmd.name == "PING")
-		handlePing(client, cmd);
+		handlePing(user, cmd);
 	else if (cmd.name == "QUIT")
-		handleQuit(client, cmd);
+		handleQuit(user, cmd);
 	else if (cmd.name == "CAP")
 	{
 		// Minimal CAP handling for clients like HexChat
-		if (!cmd.params.empty() && cmd.params[0] == "LS")
-			sendToClient(client, ":server CAP * LS :\r\n");
+		//if (!cmd.params.empty() && cmd.params[0] == "LS")
+		//	sendToClient(user, ":server CAP * LS :\r\n");
 		// LIST / REQ / END: silently ignored
 	}
 	else
 	{
 		// Not registered yet — many commands are blocked
-		if (!client.isRegistered())
+		if (!user.isRegistered())
 		{
-			std::string nick = client.getNickname().empty() ? "*" : client.getNickname();
-			sendToClient(client, ":server 451 " + nick + " :You have not registered\r\n");
+		//	std::string nick = user.getNickname().empty() ? "*" : user.getNickname();
+		//	sendToClient(user, ":server 451 " + nick + " :You have not registered\r\n");
 		}
 		else
 		{
-			sendToClient(client, ":server 421 " + client.getNickname() + " " + cmd.name + " :Unknown command\r\n");
+		//	sendToClient(user, ":server 421 " + user.getNickname() + " " + cmd.name + " :Unknown command\r\n");
 		}
 	}
 }
