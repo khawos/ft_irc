@@ -65,6 +65,8 @@ void	Server::runServer()
 {
 	bool			running = true;
 	unsigned int	nb_user = 0;
+
+	(void)nb_user; // pour éviter un warning de variable non utilisée, à supprimer quand on l'utilisera
 	while ( running )
 	{
 		poll( _pollFds.data(), _pollFds.size(), -1 );
@@ -172,6 +174,7 @@ void	Server::handleUserData(size_t pollIndex)
 
 void	Server::processCommand(User& client, const std::string& line)
 {
+	(void)client; // pour éviter un warning de variable non utilisée, à supprimer quand on l'utilisera
 	Command	cmd = parseCommand(line);
 	if (cmd.name.empty())
 		return;
@@ -181,12 +184,12 @@ void	Server::processCommand(User& client, const std::string& line)
 		std::cout << "[" << cmd.params[i] << "] ";
 	std::cout << std::endl;
 
-	// Dispatcher
+	//Dispatcher
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
 	else if ( client.isPassOk() != true )
 	{
-		send(_pollFds[client.getId() + 1].fd, "Enter the password : PASS <password>\n", 38, 0);
+		send(_pollFds[client.getFd()].fd, "Enter the password : PASS <password>\n", 38, 0);
 		return ;
 	}
 // 	else if (cmd.name == "NICK")
