@@ -1,8 +1,9 @@
 #include "../includes/User.hpp"
 
-User::User(){}
+// Constructeur par défaut : initialise TOUS les booléens (sinon mémoire aléatoire = bugs)
+User::User() : _fd(-1), _passOk(false), _nickOk(false), _userOk(false), _registered(false) {}
 
-User::User( unsigned int id ) : _id( id ), _readBuffer(""), _passOk( false ) {}
+User::User( int fd ) : _fd(fd), _readBuffer(""), _passOk(false), _nickOk(false), _userOk(false), _registered(false) {}
 
 User::~User(){}
 
@@ -30,46 +31,21 @@ bool	User::extractCommand(std::string& outLine)
 	return true;
 }
 
-const std::string &User::getUsername() const
-{
-	return ( _username );
-}
+// Getters
+int					User::getFd() const            { return _fd; }
+const std::string&	User::getUsername() const      { return _username; }
+const std::string&	User::getRealname() const      { return _realname; }
+const std::string&	User::getNickname() const      { return _nickname; }
+bool				User::isPassOk() const         { return _passOk; }
+bool				User::isNickOk() const         { return _nickOk; }
+bool				User::isUserOk() const         { return _userOk; }
+bool				User::isRegistered() const     { return _registered; }
 
-const std::string &User::getRealname() const
-{
-	return ( _realname );
-}
-
-
-const std::string &User::getNickname() const
-{
-	return ( _nickname );
-}
-
-const unsigned int &User::getId() const
-{
-	return ( _id );
-}
-
-bool User::isPassOk() const
-{
-	return ( _passOk );
-}
-bool User::isNickOk() const
-{
-	return ( _nickOk );
-}
-bool User::isUserOk() const
-{
-	return ( _userOk );
-}
-
-bool User::isRegistered() const
-{
-	return ( _registered );
-}
-
-void User::setPassOk( bool b )
-{
-	_passOk = b;
-}
+// Setters
+void	User::setNickname(const std::string& nick) { _nickname = nick; }
+void	User::setUsername(const std::string& user) { _username = user; }
+void	User::setRealname(const std::string& real) { _realname = real; }
+void	User::setPassOk(bool b)                    { _passOk = b; }
+void	User::setNickOk(bool b)                    { _nickOk = b; }
+void	User::setUserOk(bool b)                    { _userOk = b; }
+void	User::setRegistered(bool b)                { _registered = b; }

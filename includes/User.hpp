@@ -3,9 +3,9 @@
 # include <iostream> // std::cout
 class User
 {
-    private : 
+    private :
 
-        unsigned int _id;
+		int			_fd;			// file descriptor du socket client
 		std::string	_nickname;
 		std::string	_username;
 		std::string	_realname;
@@ -18,7 +18,7 @@ class User
     public :
 
         User();
-        User( unsigned int id );
+        User( int fd );
         ~User();
 
         // Getters

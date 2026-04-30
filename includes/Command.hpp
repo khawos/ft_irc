@@ -1,3 +1,5 @@
+
+#pragma once
 #include <vector> // <vector>
 #include <string> // std::string
 
