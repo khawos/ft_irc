@@ -2,7 +2,7 @@
 
 Channel::Channel() : _fd(-1) {}
 
-Channel::Channel( int fd, std::string op, std::string pass, std::string name) : _fd(fd), _operator(op), _password(pass),  _name(name)
+Channel::Channel( std::string op, std::string pass, std::string name) : _fd(fd), _operator(op), _password(pass),  _name(name)
 {
 }
 

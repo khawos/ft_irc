@@ -12,7 +12,6 @@ class Channel
 
 		std::map<std::string, User>	_Users;
 		std::map<std::string, User>	_invitedQueueUsers;
-		int							_fd;
 		std::string					_operator;
 		std::string					_password;
 		std::string					_name;
@@ -22,7 +21,7 @@ class Channel
 	public :
 		
 		Channel();
-		Channel( int fd, std::string op, std::string pass, std::string name );
+		Channel( std::string op, std::string pass, std::string name );
 		~Channel();
 		void		addUserInChannel( const User &newUSer );
 		void		deleteUserFromChannel( const User &newUSer );

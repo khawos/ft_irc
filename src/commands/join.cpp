@@ -12,13 +12,8 @@ void    Server::handleJoin(User &client, Command cmd)
 	{
 		std::string pass = cmd.params[2];
 		std::string name = cmd.params[1];
-		int			fd = socket(AF_INET, SOCK_STREAM, 0);
-		pollfd		pfd;
-
-		pfd.fd = fd;
-		pfd.events = POLLIN;
-		_pollFds.push_back(pfd);
-		Channel *channel = new Channel( fd, client.getUsername(), pass, name);
+		Channel *channel = new Channel( client.getUsername(), pass, name );
+		channel->addUserInChannel( client );
 		_channels[ name ] = channel;
 	}	
 }
