@@ -6,22 +6,24 @@
 # include <vector>
 
 
-class Chanel
+class Channel
 {
 	private:
 
 		std::map<std::string, User>	_Users;
 		std::map<std::string, User>	_invitedQueueUsers;
-		std::string					_name;
-		std::string					_password;
+		int							_fd;
 		std::string					_operator;
+		std::string					_password;
+		std::string					_name;
 		int							_mode;
 
 
 	public :
 		
-		Chanel();
-		~Chanel();
+		Channel();
+		Channel( int fd, std::string op, std::string pass, std::string name );
+		~Channel();
 		void		addUserInChannel( const User &newUSer );
 		void		deleteUserFromChannel( const User &newUSer );
 		std::string	getOperator( void ) const;

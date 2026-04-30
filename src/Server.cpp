@@ -64,7 +64,6 @@ Server::~Server()
 void	Server::runServer()
 {
 	bool			running = true;
-	unsigned int	nb_user = 0;
 	while ( running )
 	{
 		poll( _pollFds.data(), _pollFds.size(), -1 );
@@ -186,13 +185,15 @@ void	Server::processCommand(User& client, const std::string& line)
 		handlePass(client, cmd);
 	else if ( client.isPassOk() != true )
 	{
-		send(_pollFds[client.getId() + 1].fd, "Enter the password : PASS <password>\n", 38, 0);
+		send(client.getFd(), "Enter the password : PASS <password>\n", 38, 0);
 		return ;
 	}
-// 	else if (cmd.name == "NICK")
-// 		handleNick(client, cmd);
-// 	else if (cmd.name == "USER")
-// 		handleUser(client, cmd);
+ 	else if (cmd.name == "NICK")
+ 		handleNick(client, cmd);
+	else if (cmd.name == "USER")
+		handleUsername(client, cmd);
+	// else if (cmd.name == "JOIN")
+	// 	handleJoin(client, cmd);
 // 	else if (cmd.name == "PING")
 // 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")

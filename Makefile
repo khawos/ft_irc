@@ -4,8 +4,26 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
 OBJ_DIR = obj
 
-SRC := $(shell find src -maxdepth 1 -name '*.cpp')
-OBJ := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
+# Liste manuelle de tous les .cpp (chemins relatifs à src/)
+SRC = main.cpp \
+	Server.cpp \
+	User.cpp \
+	Command.cpp \
+	Channel.cpp \
+	commands/user.cpp \
+	commands/topic.cpp \
+	commands/mode.cpp \
+	commands/privmsg.cpp \
+	commands/pass.cpp \
+	commands/kick.cpp \
+	commands/nick.cpp \
+	commands/join.cpp \
+	commands/inivite.cpp
+
+# Sources avec préfixe src/
+SRCS := $(addprefix src/,$(SRC))
+
+OBJ := $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 TARGET = ircserv
 
 all: $(TARGET)
@@ -14,6 +32,7 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 $(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJ)
