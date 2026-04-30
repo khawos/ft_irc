@@ -1,14 +1,14 @@
 #include "../includes/Server.hpp"
 #include "../includes/Command.hpp"
-
-Server::Server( int port, int &flag, std::string password ) : _id(0), _password(password)
+#include "../includes/User.hpp"
+Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _port(port), _password(password)
 {
-	_port = port; //to change latter and put in the constructor
 	struct	sockaddr_in	socketAddr;
 	std::memset(&socketAddr, 0, sizeof(socketAddr));
 	socketAddr.sin_family = AF_INET;
 	socketAddr.sin_port = htons(_port); 		// htons is for big endian standard imposed by TCP/IP
 	socketAddr.sin_addr.s_addr = INADDR_ANY;
+
 	_socketFD = socket(AF_INET, SOCK_STREAM, 0); // create a socket
 	if (_socketFD == -1)
 	{
@@ -16,20 +16,30 @@ Server::Server( int port, int &flag, std::string password ) : _id(0), _password(
 		flag = -1;
 		return ;
 	}
-	int	bind_return_value = bind( _socketFD, ( const sockaddr *) &socketAddr, sizeof(socketAddr)); // bind the socket to the port
+
+	// SO_REUSEADDR pour pouvoir relancer le serveur sans attendre
+	int opt = 1;
+	setsockopt(_socketFD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+	// Mettre le socket d'écoute en non-bloquant (sinon accept() peut bloquer)
+	fcntl(_socketFD, F_SETFL, O_NONBLOCK);
+
+	int	bind_return_value = bind( _socketFD, ( const sockaddr *) &socketAddr, sizeof(socketAddr));
 	if ( bind_return_value == -1 )
 	{
 		std::cerr << "(Server Socket) Bind failed to set port " << _port << " as active listening" << std::endl;
 		flag = -1;
 		return ;
 	}
-	int	listen_return_value = listen( _socketFD, port ); // start leastening for incoming connections
+
+	int	listen_return_value = listen( _socketFD, 1024 ); // backlog = 1024 (PAS le port !)
 	if (listen_return_value == -1)
 	{
 		std::cerr << "(Server Socket) Listen failed to mark _socketFD." << std::endl;
 		flag = -1;
 		return ;
 	}
+
 	pollfd serverPoll;
 	serverPoll.fd = _socketFD;
 	serverPoll.events = POLLIN;
@@ -39,80 +49,119 @@ Server::Server( int port, int &flag, std::string password ) : _id(0), _password(
 
 Server::~Server()
 {
-	close( _socketFD );
-	for ( std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++ )
-		close( it->fd );
-	for ( size_t i = _users.size(); i != 0; i-- )
-		delete _users[i];
+	// Fermer tous les fds clients et delete les User*
+	for (std::map<int, User*>::iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		close(it->first);
+		delete it->second;
+	}
+	_users.clear();
+
+	// Puis fermer le socket d'écoute
+	if (_socketFD != -1)
+		close(_socketFD);
 }
-
-
 
 void	Server::runServer()
 {
 	bool	running = true;
 	while ( running )
 	{
-		poll( _pollFds.data(), _pollFds.size(), -1 );				// check all the socket at the same time
-		for (size_t i = 0; i < _pollFds.size(); i++)				// on boucle sur tous les sockets
+		poll( _pollFds.data(), _pollFds.size(), -1 );
+		for (size_t i = 0; i < _pollFds.size(); i++)
 		{
-			if ( _pollFds[i].revents & POLLIN )						// on regarde si il y a de la data a lire
+			if ( _pollFds[i].revents & POLLIN )
 			{
-				if (_pollFds[i].fd == _socketFD)					// est ce que c'est le socket pour se connecter au serveur ?
+				if (_pollFds[i].fd == _socketFD)
 				{
-					int client_fd = accept(_socketFD, NULL, NULL);	// ouvre un socket pour la connection entrente
+					int client_fd = accept(_socketFD, NULL, NULL);
 					if (client_fd != -1)
-						_users[ i ] = newUserConnexion( i, client_fd );
+					{
+						// On stocke par fd, pas par index !
+						_users[client_fd] = newUserConnexion(client_fd);
+					}
 					else
 						std::cerr << "Accept failed" << std::endl;
 				}
 				else
 				{
 					handleUserData( i );
+					// Si le client a été déconnecté, l'index a changé
+					if (i < _pollFds.size() && _pollFds[i].fd == -1)
+					{
+						_pollFds.erase(_pollFds.begin() + i);
+						i--;
+					}
 				}
 			}
 		}
-	}	
+	}
 }
 
-void	Server::disconnectClient( int id )
+// On prend l'index dans _pollFds pour savoir quoi supprimer
+// (l'index suffit puisqu'on a accès à _pollFds[id].fd pour retrouver le User)
+void	Server::disconnectClient( size_t pollIndex )
 {
-	close( _pollFds[id].fd );
-	_pollFds.erase( _pollFds.begin() + id);
-	delete _users[id - 1];
+	int fd = _pollFds[pollIndex].fd;
+	std::cout << "Client (fd=" << fd << ") disconnected from the server" << std::endl;
+
+	// Fermer le socket
+	close(fd);
+
+	// Delete le User et l'enlever du map (par fd, pas par index)
+	if (_users.count(fd))
+	{
+		delete _users[fd];
+		_users.erase(fd);
+	}
+
+	// Enlever du _pollFds
+	_pollFds.erase(_pollFds.begin() + pollIndex);
 }
 
-void	Server::handleConnexion( std::vector<std::string> args, int id )
+void	Server::handleConnexion( std::vector<std::string> args, int fd )
 {
 	if ( args[0] != _password )
 	{
-		disconnectClient( id );
+		// Pour déconnecter par fd, il faut retrouver l'index dans _pollFds
+		for (size_t i = 0; i < _pollFds.size(); i++)
+		{
+			if (_pollFds[i].fd == fd)
+			{
+				disconnectClient(i);
+				break;
+			}
+		}
 		std::cout << "Wrong password try again" << std::endl;
 	}
 	else
 		std::cout << "Successfuly connected" << std::endl;
 }
 
-void	Server::handleCommand( std::string cmd, std::vector<std::string> args, int id )
+void	Server::handleCommand( std::string cmd, std::vector<std::string> args, int fd )
 {
 	std::cout << " cmd : " << cmd << std::endl;
 	if ( cmd == "PASS" )
 	{
-		handleConnexion( args, id );
+		handleConnexion( args, fd );
 	}
 }
 
-User	*Server::newUserConnexion( size_t i, int client_fd )
+User	*Server::newUserConnexion( int client_fd )
 {
-	std::cout << "New client connected!" << std::endl;
-	User *newUser = new User( i );
-	fcntl( client_fd, O_NONBLOCK );
+	std::cout << "New client connected! (fd=" << client_fd << ")" << std::endl;
+
+	// fcntl correct : fcntl(fd, F_SETFL, O_NONBLOCK)
+	fcntl(client_fd, F_SETFL, O_NONBLOCK);
+
 	pollfd clientPoll;
 	clientPoll.fd = client_fd;
 	clientPoll.events = POLLIN;
-	_pollFds.push_back( clientPoll );
-	std::cout << "Client number " << i << " has been added to the server" << std::endl;
-	return ( newUser );
+	_pollFds.push_back(clientPoll);
+
+	User *newUser = new User(client_fd);  // on passe le fd comme id et fd
+	std::cout << "Client (fd=" << client_fd << ") has been added to the server" << std::endl;
+	return newUser;
 }
 
 void	Server::handleUserData(size_t pollIndex)
@@ -121,20 +170,23 @@ void	Server::handleUserData(size_t pollIndex)
 	char	buffer[1024];
 
 	int	bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
-	buffer[bytes] = '\0';
+
+	// CHECK AVANT de toucher buffer[bytes] !
 	if (bytes <= 0)
 	{
-		std::cout << "Client number " << pollIndex - 1 << " has been disconected form the server" << std::endl;
 		disconnectClient(pollIndex);
 		return;
 	}
+	buffer[bytes] = '\0';
 
-	User *user = _users[pollIndex - 1];
-	if (!user)
+	// Récupérer le User par son fd (clé stable)
+	if (!_users.count(fd))
 	{
-		std::cerr << "No user found for fd " << pollIndex << std::endl;
+		std::cerr << "No user found for fd " << fd << std::endl;
 		return;
 	}
+	User *user = _users[fd];
+
 	user->appendToReadBuffer(std::string(buffer, bytes));
 	std::string	line;
 	while (user->extractCommand(line))
@@ -142,53 +194,46 @@ void	Server::handleUserData(size_t pollIndex)
 		if (line.empty())
 			continue;
 		std::cout << "[RECV fd=" << fd << "] " << line << std::endl;
-		//processCommand(*user, line);
+		processCommand(*user, line);
 	}
 }
 
-
-
 void	Server::processCommand(User& user, const std::string& line)
 {
+	(void)user; // pour éviter "unused parameter" tant que processCommand est pas implémentée
+
 	Command	cmd = parseCommand(line);
 	if (cmd.name.empty())
 		return;
 
-	// Debug print
 	std::cout << "[PARSED] name=" << cmd.name << " params=";
 	for (size_t i = 0; i < cmd.params.size(); i++)
 		std::cout << "[" << cmd.params[i] << "] ";
 	std::cout << std::endl;
 
-	// Dispatcher
-	if (cmd.name == "PASS")
-		handlePass(user, cmd);
-	else if (cmd.name == "NICK")
-		handleNick(user, cmd);
-	else if (cmd.name == "USER")
-		handleUser(user, cmd);
-	else if (cmd.name == "PING")
-		handlePing(user, cmd);
-	else if (cmd.name == "QUIT")
-		handleQuit(user, cmd);
-	else if (cmd.name == "CAP")
-	{
-		// Minimal CAP handling for clients like HexChat
-		//if (!cmd.params.empty() && cmd.params[0] == "LS")
-		//	sendToClient(user, ":server CAP * LS :\r\n");
-		// LIST / REQ / END: silently ignored
-	}
-	else
-	{
-		// Not registered yet — many commands are blocked
-		if (!user.isRegistered())
-		{
-		//	std::string nick = user.getNickname().empty() ? "*" : user.getNickname();
-		//	sendToClient(user, ":server 451 " + nick + " :You have not registered\r\n");
-		}
-		else
-		{
-		//	sendToClient(user, ":server 421 " + user.getNickname() + " " + cmd.name + " :Unknown command\r\n");
-		}
-	}
+	// if (cmd.name == "PASS")
+	// 	handlePass(user, cmd);
+	// else if (cmd.name == "NICK")
+	// 	handleNick(user, cmd);
+	// else if (cmd.name == "USER")
+	// 	handleUser(user, cmd);
+	// else if (cmd.name == "PING")
+	// 	handlePing(user, cmd);
+	// else if (cmd.name == "QUIT")
+	// 	handleQuit(user, cmd);
+	// else if (cmd.name == "CAP")
+	// {
+	// 	// Minimal CAP handling
+	// }
+	// else
+	// {
+	// 	if (!user.isRegistered())
+	// 	{
+	// 		//
+	// 	}
+	// 	else
+	// 	{
+	// 		//
+	// 	}
+	// }
 }
