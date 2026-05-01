@@ -1,5 +1,5 @@
 #pragma once
-# include <sys/socket.h> // socket() listen()
+# include <sys/socket.h> // socket() listen() send()
 # include <iostream> // cout cerr
 # include <unistd.h> // close()
 # include <fcntl.h> // fcntl()
