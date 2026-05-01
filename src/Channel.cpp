@@ -2,22 +2,17 @@
 
 Channel::Channel(){}
 
-Channel::Channel( std::string op, std::string pass, std::string name) :  _operator(op), _password(pass),  _name(name)
+Channel::Channel( std::string op, std::string pass, std::string name) :  _operator(op),  _name(name), _inviteMode(false), _topicIsOnlyOP(false), _key(false)
 {
+	_password = pass;
 }
 
 Channel::~Channel(){}
 
 void	Channel::addUserInChannel( const User &newUser )
 {
-	switch ( _mode )
-	{
-		case 0:
-		{
-			_Users[ newUser.getUsername()] = newUser;			
-			break ;
-		}
-	}
+	_Users[ newUser.getUsername()] = newUser;			
+
 }
 
 void	Channel::deleteUserFromChannel( const User &userToDelete )
@@ -56,4 +51,49 @@ void	Channel::sendMessage( const std::string &msg ) const
 	{
 		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
 	}
+}
+
+void	Channel::setPassword( std::string str )
+{
+	_password = str;
+	if ( str.empty() )
+		_key = false;
+	else
+		_key = true; 
+}
+
+std::string	Channel::getPassword()
+{
+	return ( _password );
+}
+
+void	Channel::setInviteMode()
+{
+	if ( _inviteMode == false )
+		_inviteMode = true;
+	else
+		_inviteMode = false;
+}
+
+bool	Channel::getInviteMode()
+{
+	return ( _inviteMode );
+}
+
+void	Channel::setTopicIsOnlyOp()
+{
+	if ( _topicIsOnlyOP == false )
+		_topicIsOnlyOP = true;
+	else
+		_topicIsOnlyOP = false;
+}
+
+bool	Channel::getTopicIsOnlyOp()
+{
+	return ( _topicIsOnlyOP );
+}
+
+bool	Channel::getKey()
+{
+	return ( _key );
 }

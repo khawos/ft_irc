@@ -36,9 +36,11 @@ class Server {
 		void	disconnectClient( size_t pollIndex );
 		void	handleUserData(size_t pollIndex);
 		void	processCommand(User& client, const std::string& line);
+
 		void	handlePass(User &client, Command cmd);
 		void	handleNick(User &client, Command cmd);
 		void	handleJoin(User &client, Command cmd);
 		void	handleUsername(User &client, Command cmd);
+		void    handlemode(User &client, Command cmd);
 
 };

@@ -19,7 +19,6 @@ void    Server::handleJoin(User &client, Command cmd)
 	}
 	catch(const std::exception& e)
 	{
-		std::cout << "ici" << std::endl;
 		std::string pass = "";
 		if  ( cmd.params.size() > 2 )
 			pass = cmd.params[1];
