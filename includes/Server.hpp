@@ -40,5 +40,6 @@ class Server {
 		void	handleNick(User &client, Command cmd);
 		void	handleJoin(User &client, Command cmd);
 		void	handleUsername(User &client, Command cmd);
+		void	handlePrivmsg(User &client, Command cmd);
 
 };

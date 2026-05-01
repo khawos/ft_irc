@@ -9,7 +9,7 @@ void Server::handleNick(User &client, Command cmd)
     else if ( client.isNickOk() != true )
     {
         client.setNickname(cmd.params[0]);
-        std::string msg = client.getNickname() + " is set as nickname";
+        std::string msg = client.getNickname() + " is set as nickname\n";
 		send(client.getFd(), msg.c_str(), msg.size(), 0);    
         client.setNickOk( true );        
     }

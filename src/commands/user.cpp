@@ -9,7 +9,7 @@ void Server::handleUsername(User &client, Command cmd)
 	else if ( client.isUserOk() != true )
 	{
 		client.setUsername(cmd.params[0]);
-		std::string msg = client.getUsername() + " is set as username";
+		std::string msg = client.getUsername() + " is set as username\n";
 		send(client.getFd(), msg.c_str(), msg.size(), 0);
         client.setUserOk( true );        
 	}
