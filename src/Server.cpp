@@ -202,6 +202,8 @@ void	Server::processCommand(User& client, const std::string& line)
 		handlemode(client, cmd);
 	else if (cmd.name == "PRIVMSG")
 		handlePrivmsg(client, cmd);
+	else if (cmd.name == "TOPIC")
+		handletopic(client, cmd);
 // 	else if (cmd.name == "PING")
 // 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")
