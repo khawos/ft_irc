@@ -44,5 +44,6 @@ class Server {
 		void	handleUsername(User &client, Command cmd);
 		void    handlemode(User &client, Command cmd);
 		void    handletopic(User &client, Command cmd);
+		void	handlePrivmsg(User &client, Command cmd);
 
 };

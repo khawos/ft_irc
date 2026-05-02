@@ -197,6 +197,16 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleJoin(client, cmd);
 	else if (cmd.name == "MODE")
 		handlemode(client, cmd);
+	else if (cmd.name == "PRIVMSG")
+		handlePrivmsg(client, cmd);
+	if (client.isPassOk() && client.isNickOk() && client.isUserOk() && !client.isRegistered())
+	{
+		client.setRegistered(true);
+		std::string welcomeMsg = "Welcome to the IRC server, " + client.getNickname() + "!\n";
+		send(client.getFd(), welcomeMsg.c_str(), welcomeMsg.size(), 0);
+	}
+// 	else if (cmd.name == "PING")
+// 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")
 // 		handleQuit(client, cmd);
 // 	else if (cmd.name == "CAP")
