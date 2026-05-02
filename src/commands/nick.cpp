@@ -1,5 +1,13 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * @author			Jbayeonne
+ * 
+ * @param	client	calling client
+ * @param	cmd		struct of params
+ * 
+ * @note			Allow client to set their nick after enter the password
+ */
 void Server::handleNick(User &client, Command cmd)
 {
 	if ( cmd.params.size() != 1 )

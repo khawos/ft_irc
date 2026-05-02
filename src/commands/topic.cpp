@@ -1,5 +1,13 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * 
+ * @author		Jbayonne
+ * @param		client calling client
+ * @param		cmd		struct of params
+ * 
+ * @note		Allow client to set the topic of a channel
+ */
 void    Server::handletopic( User &client, Command cmd )
 {
 	if ( cmd.params.size() != 2 && cmd.params.size() != 1 )

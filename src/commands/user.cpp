@@ -1,6 +1,15 @@
 #include "../../includes/Server.hpp"
 
-void Server::handleUsername(User &client, Command cmd)
+/**
+ * @author			Jbayeonne
+ * 
+ * @param	client	calling client
+ * @param	cmd		struct of params
+ * 
+ * @note			Allow client to set their username after enter the password
+ * @note			The username can only be set one time
+ */
+ void Server::handleUsername(User &client, Command cmd)
 {
 	if ( cmd.params.size() != 1 )
 	{

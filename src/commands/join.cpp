@@ -1,5 +1,14 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * 
+ * @author 		Jbayonne
+ * @param user	joining client
+ * 
+ * @note		Informe clients when someone join one of their channel 
+ * 
+ * 
+ */
 void	Channel::send_relay_message( User &user )
 {
 	std::string msg = ":" + user.getUsername() + "!127.0.0.1" + "JOIN :" + getName() + "\r\n";
@@ -8,6 +17,14 @@ void	Channel::send_relay_message( User &user )
 		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
 }
 
+/**
+ * 
+ * @author 			Jbayonne
+ * @param client	calling client
+ * @param cmd		struct of params
+ * 
+ * @note 			Allow client to join a channel or to create a channel
+ */
 void    Server::handleJoin(User &client, Command cmd)
 {
 	if ( cmd.params.size() < 1 )

@@ -1,5 +1,15 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * @author 			Jbayonne
+ * @param client	Calling client
+ * @param cmd		Struct of param
+ * 
+ * @note			This function allow operator to manage the channel settings
+ * @note			-i: change invite mode
+ * @note			-k: set / unset password
+ * @note			-t: allow / disallow user to change channel's topic 				
+ */
 void    Server::handlemode(User &client, Command cmd)
 {
 	if ( cmd.params.size() < 2 )

@@ -1,5 +1,14 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * @author			Jbayeonne
+ * 
+ * @param	client	calling client
+ * @param	cmd		struct of params
+ * 
+ * @note			Allow client to connect to the server
+ * @note			First command to enter as a client
+ */
 void    Server::handlePass(User &client, Command cmd)
 {
 	if (cmd.params.size() != 1)

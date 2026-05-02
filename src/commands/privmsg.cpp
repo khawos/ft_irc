@@ -1,5 +1,14 @@
 #include "../../includes/Server.hpp"
 
+/**
+ * 
+ * @author	Amedenec
+ * 
+ * @param	client	calling client
+ * @param	cmd		struct of params
+ * 
+ * @note			Allow client to send message in channel or to other client
+ */
 void	Server::handlePrivmsg(User &client, Command cmd)
 {
 	if (!client.isRegistered())
