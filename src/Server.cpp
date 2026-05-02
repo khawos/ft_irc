@@ -49,15 +49,15 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 
 Server::~Server()
 {
-	// Fermer tous les fds clients et delete les User*
 	for (std::map<int, User*>::iterator it = _users.begin(); it != _users.end(); ++it)
 	{
 		close(it->first);
 		delete it->second;
 	}
 	_users.clear();
-
-	// Puis fermer le socket d'écoute
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+		delete it->second;
+	_channels.clear();
 	if (_socketFD != -1)
 		close(_socketFD);
 }
