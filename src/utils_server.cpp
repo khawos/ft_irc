@@ -22,3 +22,23 @@ void Server::sendWelcomeMessages(User& client) {
     // 3. Envoi d'un seul bloc (plus optimisé pour le réseau)
     send(client.getFd(), welcomeMsg.c_str(), welcomeMsg.length(), 0);
 }
+
+bool    Server::isUser( std::string nickname )
+{
+    for ( std::map<int, User *>::const_iterator it = _users.begin() ; it != _users.end() ; it++  )
+    {
+        if ( it->second->getNickname() == nickname )
+            return (true);
+    }
+    return (false);
+}
+
+User    *Server::getUser( std::string nickname ) const
+{
+    for ( std::map<int, User *>::const_iterator it = _users.begin() ; it != _users.end() ; it++  )
+    {
+        if ( it->second->getNickname() == nickname )
+            return ( it->second );
+    }
+    return (NULL);
+}

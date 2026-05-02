@@ -78,10 +78,6 @@ void	Channel::sendMessage_broadcast( const std::string &msg ) const
 void	Channel::setPassword( std::string str )
 {
 	_password = str;
-	if ( str.empty() )
-		_key = false;
-	else
-		_key = true; 
 }
 
 std::string	Channel::getPassword()
@@ -89,12 +85,14 @@ std::string	Channel::getPassword()
 	return ( _password );
 }
 
-void	Channel::setInviteMode()
+void	Channel::setInviteMode( bool b)
 {
-	if ( _inviteMode == false )
-		_inviteMode = true;
-	else
-		_inviteMode = false;
+		_inviteMode = b;
+}
+
+void	Channel::setKey( bool b)
+{
+		_key = b;
 }
 
 bool	Channel::getInviteMode() const
@@ -102,12 +100,9 @@ bool	Channel::getInviteMode() const
 	return ( _inviteMode );
 }
 
-void	Channel::setTopicIsOnlyOp()
+void	Channel::setTopicIsOnlyOp( bool b)
 {
-	if ( _topicIsOnlyOP == false )
-		_topicIsOnlyOP = true;
-	else
-		_topicIsOnlyOP = false;
+	_topicIsOnlyOP = b;
 }
 
 bool	Channel::getTopicIsOnlyOp() const
@@ -141,4 +136,27 @@ void	Channel::setTopic( std::string str )
 std::string	Channel::getTopic()
 {
 	return ( _topic );
+}
+
+void	Channel::promoteOp( User *admin, User *toPromote )
+{
+	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@127.0.0.1";
+	std::string broadcastMsg = ":" + prefix + " MODE " + getName() + " +o " + toPromote->getNickname() + "\r\n";
+	sendMessage_broadcast( broadcastMsg );
+	_operator.push_back( toPromote );
+}
+
+void	Channel::demoteOp( User *admin, User *toDemote )
+{
+	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@127.0.0.1";
+	std::string broadcastMsg = ":" + prefix + " MODE " + getName() + " -o " + toDemote->getNickname() + "\r\n";
+	for (std::vector<User *>::iterator it = _operator.begin(); it != _operator.end() ; it++ )
+	{
+		if ((*it)->getNickname() == toDemote->getNickname())
+		{
+			_operator.erase( it );
+			return ;
+		}
+	}
+
 }

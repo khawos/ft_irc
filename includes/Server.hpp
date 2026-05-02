@@ -48,4 +48,6 @@ class Server {
 
 		void	sendWelcomeMessages( User &client );
 
+		bool	isUser( std::string userNickName );
+		User	*getUser( std::string nickname ) const;
 };

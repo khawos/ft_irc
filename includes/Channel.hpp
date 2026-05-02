@@ -17,9 +17,13 @@ class Channel
 		std::string						_password;
 		std::string						_name;
 		std::string						_topic;
+
+		unsigned int					limit_user;
+
 		bool							_inviteMode;
 		bool							_topicIsOnlyOP;
 		bool							_key;
+		bool							_userLimit;
 
 	public :
 		
@@ -40,15 +44,19 @@ class Channel
 		void								send_relay_message( User &user );
 
 		void								setPassword( std::string str );
+		void								setKey( bool b );
 		void								setTopic( std::string str );
 
 		bool								isInvited( User user ) const;
 		std::string							getPassword();
 		std::string							getTopic();
-		void								setTopicIsOnlyOp();
+		void								setTopicIsOnlyOp( bool b );
 		bool								getTopicIsOnlyOp() const;
-		void								setInviteMode();
+		void								setInviteMode( bool b);
 		bool								getInviteMode() const;
 		bool								getKey() const;
+
+		void								promoteOp( User *admin, User *toPromote );
+		void								demoteOp( User *admin, User *toDemote );
 
 };

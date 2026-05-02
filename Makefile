@@ -19,7 +19,7 @@ SRC = main.cpp \
 	commands/nick.cpp \
 	commands/join.cpp \
 	commands/inivite.cpp \
-	welcomeMessage.cpp
+	utils_server.cpp
 
 # Sources avec préfixe src/
 SRCS := $(addprefix src/,$(SRC))

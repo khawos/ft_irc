@@ -27,15 +27,44 @@ void    Server::handlemode(User &client, Command cmd)
 			return ;
 		}
 		if ( cmd.params[1] == "-i" )
-			channel->setInviteMode();
+			channel->setInviteMode( false );
+		else if ( cmd.params[1] == "+i")
+			channel->setInviteMode( true );
 		else if ( cmd.params[1] == "-t" )
-			channel->setTopicIsOnlyOp();
-		else if ( cmd.params[1] == "-k" )
+			channel->setTopicIsOnlyOp( false );
+		else if ( cmd.params[1] == "+t" )
+			channel->setTopicIsOnlyOp( true );
+		else if ( cmd.params[1] == "-k" || cmd.params[1] == "+k" )
 		{	
-			if ( cmd.params.size() == 3 )
+			if ( cmd.params.size() != 3 && cmd.params[1] == "+k" )
+			{
+				// error
+			}
+			else if ( cmd.params.size() != 3 && cmd.params[1] == "+k" )
+			{
 				channel->setPassword( cmd.params[2] );
+				channel->setKey( true );
+			}
+			else if ( cmd.params.size() != 2 && cmd.params[1] == "-k" )
+			{
+				// error
+			}
 			else
+			{
 				channel->setPassword("");
+				channel->setKey( false );			}
+		}
+		else if (cmd.params.size() == 2 && cmd.params[1] == "-o")
+		{
+			User *todemote = getUser( cmd.params[2] );
+			if ( todemote )
+				channel->demoteOp( &client, todemote );
+		}
+		else if (cmd.params.size() == 2 && cmd.params[1] == "+o")
+		{
+			User *topromote = getUser( cmd.params[2] );
+			if ( topromote )
+				channel->promoteOp( &client, topromote );
 		}
 	}
 	catch( const std::exception& e )
