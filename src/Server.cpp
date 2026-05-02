@@ -132,7 +132,6 @@ User	*Server::newUserConnexion( int client_fd )
 	_pollFds.push_back(clientPoll);
 
 	User *newUser = new User(client_fd);  // on passe le fd comme id et fd
-	std::cout << "Client (fd=" << client_fd << ") has been added to the server" << std::endl;
 	return newUser;
 }
 
@@ -165,7 +164,6 @@ void	Server::handleUserData(size_t pollIndex)
 	{
 		if (line.empty())
 			continue;
-		std::cout << "[RECV fd=" << fd << "] " << line << std::endl;
 		processCommand( *user, line );
 	}
 }
@@ -193,18 +191,17 @@ void	Server::processCommand(User& client, const std::string& line)
  		handleNick(client, cmd);
 	else if (cmd.name == "USER")
 		handleUsername(client, cmd);
+	else if (!client.isRegistered())
+	{
+		send(client.getFd(), "Register first : USER and NICK\n", 38, 0);
+		return ;
+	}
 	else if (cmd.name == "JOIN")
 		handleJoin(client, cmd);
 	else if (cmd.name == "MODE")
 		handlemode(client, cmd);
 	else if (cmd.name == "PRIVMSG")
 		handlePrivmsg(client, cmd);
-	if (client.isPassOk() && client.isNickOk() && client.isUserOk() && !client.isRegistered())
-	{
-		client.setRegistered(true);
-		std::string welcomeMsg = "Welcome to the IRC server, " + client.getNickname() + "!\n";
-		send(client.getFd(), welcomeMsg.c_str(), welcomeMsg.size(), 0);
-	}
 // 	else if (cmd.name == "PING")
 // 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")

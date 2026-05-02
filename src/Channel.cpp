@@ -61,9 +61,7 @@ void	Channel::sendMessage( const std::string &msg, User client ) const
 	const std::map<std::string, User>	&_User = getUserMap();
 	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
-		if ( it->second.getNickname() == client.getNickname() )
-			it++;
-		if ( it != _User.end() )
+		if ( it->second.getNickname() != client.getNickname() )
 			send(it->second.getFd(), msg.c_str(), msg.size(), 0);
 	}
 }

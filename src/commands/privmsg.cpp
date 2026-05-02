@@ -14,26 +14,20 @@ void	Server::handlePrivmsg(User &client, Command cmd)
 		send(client.getFd(), err.c_str(), err.size(), 0);
 		return;
 	}
-
 	std::string target = cmd.params[0];
 	std::string message = cmd.params[1];
-	std::string fullMsg = ":" + client.getNickname() + "." + client.getUsername()
-		+ "PRIVMSG " + target + " :" + message + "\r\n";
-
-	if (target[0] == '#') // emvoier à tous les membres du channel sauf le sender
+	std::string fullMsg = ":" + client.getNickname() + "." + client.getUsername() + "PRIVMSG " + target + " :" + message + "\r\n";
+	if (target[0] == '#')
 	{
-		if (_channels.find(target) == _channels.end()) // chercher le channel
+		std::cout << "Message : " << fullMsg << " Channel : " << target << std::endl;
+		if ( _channels.find(target) == _channels.end() )
 		{
 			std::string err = ":server 403 " + client.getNickname() + " " + target + " :No such channel\r\n";
 			send(client.getFd(), err.c_str(), err.size(), 0);
 			return;
 		}
-		const std::map<std::string, User> &members = _channels[target]->getUserMap();				// récupérer les membres du channel
-		for (std::map<std::string, User>::const_iterator it = members.begin(); it != members.end(); ++it) // envoyer le message à tous les membres sauf le sender
-		{																									// peut pototiellement etre remplace par la fonction sendMessage() mais ATM ca marche.
-			if (it->second.getFd() != client.getFd())
-				send(it->second.getFd(), fullMsg.c_str(), fullMsg.size(), 0);
-		}
+		Channel	*channel = _channels[ target ];
+		channel->sendMessage( fullMsg, client );
 	}
 	else
 	{

@@ -14,7 +14,5 @@ void    Server::handlePass(User &client, Command cmd)
 	{
 		client.setPassOk( true );
 		send(client.getFd(), "Succesfully Connected\n", 23, 0);
-		send(client.getFd(), "Use 'NICK <your_nickname>' in order to initialize your nickname\n", 65, 0);
-		send(client.getFd(), "Use 'USER <your_nickname>' in order to initialize your username\n", 65, 0);
 	}
 }

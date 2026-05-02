@@ -9,7 +9,12 @@ void Server::handleUsername(User &client, Command cmd)
 	else if ( client.isUserOk() != true )
 	{
 		client.setUsername(cmd.params[0]);
-        client.setUserOk( true );        
+        client.setUserOk( true );
+		if (client.isNickOk())
+		{
+            client.setRegistered(true);   
+			sendWelcomeMessages( client );
+		}
 	}
 	else
 	{

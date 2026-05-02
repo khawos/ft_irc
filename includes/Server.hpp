@@ -46,4 +46,6 @@ class Server {
 		void    handletopic(User &client, Command cmd);
 		void	handlePrivmsg(User &client, Command cmd);
 
+		void	sendWelcomeMessages( User &client );
+
 };
