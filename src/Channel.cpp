@@ -2,9 +2,13 @@
 
 Channel::Channel(){}
 
-Channel::Channel( std::string op, std::string pass, std::string name) :  _operator(op),  _name(name), _inviteMode(false), _topicIsOnlyOP(false), _key(false)
+Channel::Channel( std::string op, std::string pass, std::string name) :  _operator(op),  _name(name), _inviteMode(false), _topicIsOnlyOP(false)
 {
 	_password = pass;
+	if ( _password.size() != 0)
+		_key = true;
+	else
+		_key = false;
 }
 
 Channel::~Channel(){}
@@ -39,15 +43,15 @@ const std::string &Channel::getName() const
 	return (_name);
 }
 
-const std::map<std::string, User&> &Channel::getUserMap() const
+const std::map<std::string, User> &Channel::getUserMap() const
 {
 	return ( _Users );
 }
 
 void	Channel::sendMessage( const std::string &msg ) const
 {
-	const std::map<std::string, User&>	&_User = getUserMap();
-	for ( std::map<std::string, User&>::const_iterator it = _User.begin(); it != _User.end(); it++ )
+	const std::map<std::string, User>	&_User = getUserMap();
+	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
 		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
 	}
@@ -98,14 +102,14 @@ bool	Channel::getKey() const
 	return ( _key );
 }
 
-bool	Channel::isInvited( User &user ) const
+bool	Channel::isInvited( User user_ ) const
 {
 	try
 	{
-		_invitedQueueUsers.at( user );
+		_invitedQueueUsers.at( user_.getUsername() );
 		return ( true );
 	}
-	catch ( std::exception )
+	catch ( std::exception &e)
 	{
 		return ( false );
 	}

@@ -4,7 +4,7 @@ void    Server::handlemode(User &client, Command cmd)
 {
 	if ( cmd.params.size() < 2 )
 	{
-		send(client.getFd(), "Use : MODE <channel> <flags>", 29, 0);
+		send(client.getFd(), "Use : MODE <channel> <flags>\n", 30, 0);
 		return ;
 	}
 	try
@@ -30,7 +30,7 @@ void    Server::handlemode(User &client, Command cmd)
 	}
 	catch( const std::exception& e )
 	{
-		send( client.getFd(), "Use : MODE <channel> <flags>", 29, 0 );
+		send( client.getFd(), "Use : MODE <channel> <flags>\n", 30, 0 );
 		return ;
 	}
 

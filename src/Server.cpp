@@ -194,8 +194,8 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleUsername(client, cmd);
 	else if (cmd.name == "JOIN")
 		handleJoin(client, cmd);
-// 	else if (cmd.name == "PING")
-// 		handlePing(client, cmd);
+	else if (cmd.name == "MODE")
+		handlemode(client, cmd);
 // 	else if (cmd.name == "QUIT")
 // 		handleQuit(client, cmd);
 // 	else if (cmd.name == "CAP")
