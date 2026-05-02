@@ -26,45 +26,68 @@ void    Server::handlemode(User &client, Command cmd)
 			send(client.getFd(), "You must be the channel's operator to operate such action\n", 59, 0);
 			return ;
 		}
-		if ( cmd.params[1] == "-i" )
+		std::string	option = cmd.params[1];
+		if ( option == "-i" )
 			channel->setInviteMode( false );
-		else if ( cmd.params[1] == "+i")
+		else if ( option == "+i")
 			channel->setInviteMode( true );
-		else if ( cmd.params[1] == "-t" )
+		else if ( option == "-t" )
 			channel->setTopicIsOnlyOp( false );
-		else if ( cmd.params[1] == "+t" )
+		else if ( option == "+t" )
 			channel->setTopicIsOnlyOp( true );
-		else if ( cmd.params[1] == "-k" || cmd.params[1] == "+k" )
+		else if ( option == "-k" || option == "+k" )
 		{	
-			if ( cmd.params.size() != 3 && cmd.params[1] == "+k" )
+			if ( cmd.params.size() != 3 && option == "+k" )
 			{
 				// error
 			}
-			else if ( cmd.params.size() != 3 && cmd.params[1] == "+k" )
+			else if ( cmd.params.size() != 3 && option == "+k" )
 			{
 				channel->setPassword( cmd.params[2] );
 				channel->setKey( true );
 			}
-			else if ( cmd.params.size() != 2 && cmd.params[1] == "-k" )
+			else if ( cmd.params.size() != 2 && option == "-k" )
 			{
 				// error
 			}
 			else
 			{
 				channel->setPassword("");
-				channel->setKey( false );			}
+				channel->setKey( false );			
+			}
 		}
-		else if (cmd.params.size() == 2 && cmd.params[1] == "-o")
+		else if (option == "-o" || option == "+o" )
 		{
-			User *todemote = getUser( cmd.params[2] );
-			if ( todemote )
-				channel->demoteOp( &client, todemote );
+			if ( cmd.params.size() != 2 )
+			{	
+				// error
+			}
+			User *user = getUser( cmd.params[2] );
+			if ( option == "-o" )
+			{
+				if ( user )
+					channel->demoteOp( &client, user );
+			}
+			else
+			{
+				if ( user )
+					channel->promoteOp( &client, user );
+			}
 		}
-		else if (cmd.params.size() == 2 && cmd.params[1] == "+o")
+		else if ( option == "-l" || option == "+l" )
 		{
-			User *topromote = getUser( cmd.params[2] );
-			if ( topromote )
-				channel->promoteOp( &client, topromote );
+			if ( option == "+l" && cmd.params.size() == 3 )
+			{
+				channel->setUserLimit( std::atoi( cmd.params[2].c_str() ) );
+			}
+			else if ( option == "-l" && cmd.params.size() == 2 )
+			{
+				channel->setUserLimit( 0 );
+			}
+			else
+			{
+				// error
+			}
 		}
 	}
 	catch( const std::exception& e )

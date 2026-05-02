@@ -4,6 +4,7 @@ Channel::Channel(){}
 
 Channel::Channel( User *op, std::string pass, std::string name) : _name(name), _topic(""), _inviteMode(false), _topicIsOnlyOP(false)
 {
+	_nbUser = 0;
 	_password = pass;
 	if ( _password.size() != 0)
 		_key = true;
@@ -88,6 +89,31 @@ std::string	Channel::getPassword()
 void	Channel::setInviteMode( bool b)
 {
 		_inviteMode = b;
+}
+
+void	Channel::setUserLimit( int limit )
+{
+	_limit_user = limit;
+}
+
+unsigned int	Channel::getUserLimit() const
+{
+	return ( _limit_user );
+}
+
+unsigned int	Channel::getNbUser( void ) const
+{
+	return ( _nbUser );
+}
+
+void	Channel::incNbUSer( void )
+{
+	_nbUser++;
+}
+
+void	Channel::decNbUSer( void )
+{
+	_nbUser--;
 }
 
 void	Channel::setKey( bool b)

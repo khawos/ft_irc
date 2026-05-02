@@ -18,12 +18,12 @@ class Channel
 		std::string						_name;
 		std::string						_topic;
 
-		unsigned int					limit_user;
+		unsigned int					_limit_user;
+		unsigned int					_nbUser;
 
 		bool							_inviteMode;
 		bool							_topicIsOnlyOP;
 		bool							_key;
-		bool							_userLimit;
 
 	public :
 		
@@ -46,15 +46,21 @@ class Channel
 		void								setPassword( std::string str );
 		void								setKey( bool b );
 		void								setTopic( std::string str );
-
+		void								setUserLimit( int );
 		bool								isInvited( User user ) const;
 		std::string							getPassword();
+		unsigned int						getNbUser( void ) const;
+		void								incNbUSer(); 
+		void								decNbUSer(); 
 		std::string							getTopic();
 		void								setTopicIsOnlyOp( bool b );
 		bool								getTopicIsOnlyOp() const;
 		void								setInviteMode( bool b);
 		bool								getInviteMode() const;
 		bool								getKey() const;
+		unsigned int						getUserLimit(void) const;
+
+
 
 		void								promoteOp( User *admin, User *toPromote );
 		void								demoteOp( User *admin, User *toDemote );

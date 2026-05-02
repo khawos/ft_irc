@@ -38,7 +38,16 @@ void    Server::handleJoin(User &client, Command cmd)
 		_channels.at( cmd.params[0] );
 		Channel *channel = _channels[ cmd.params[0] ];
 		/**
-		 *  Password mode
+		 *  Check for limit -----------------------------------------------------------------------------------------
+		 */
+		if ( channel->getUserLimit() && channel->getNbUser() >= channel->getUserLimit())
+		{
+			std::string errMsg = ":ircserv 471 " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+l)\r\n";
+    		send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
+		    return;
+		}
+		/**
+		 *  Password mode---------------------------------------------------------------------------------------------
 		 */
 		if ( channel->getKey() == true )
 		{
@@ -56,7 +65,7 @@ void    Server::handleJoin(User &client, Command cmd)
 			}
 		}
 		/**
-		 * Invitation mode
+		 * Invitation mode---------------------------------------------------------------------------------------------
 		 */
 		if ( channel->getInviteMode() == true && channel->isInvited( client ) == false )
 		{
@@ -65,6 +74,7 @@ void    Server::handleJoin(User &client, Command cmd)
 		}
 		channel->addUserInChannel( client );
 		channel->send_relay_message( client);
+		channel->incNbUSer();
 	}
 	catch(const std::exception& e)
 	{
@@ -74,6 +84,7 @@ void    Server::handleJoin(User &client, Command cmd)
 		std::string name = cmd.params[0];
 		Channel *channel = new Channel( &client, pass, name );
 		channel->addUserInChannel( client );
+		channel->incNbUSer();
 		_channels[ name ] = channel;
 		channel->send_relay_message( client );
 	}	
