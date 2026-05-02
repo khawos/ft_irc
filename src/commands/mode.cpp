@@ -11,7 +11,7 @@ void    Server::handlemode(User &client, Command cmd)
 	{
 		_channels.at( cmd.params[0] );
 		Channel *channel = _channels[ cmd.params[0] ];
-		if ( client.getUsername() != channel->getOperator() )
+		if ( !channel->isOperator( client ) )
 		{
 			send(client.getFd(), "You must be the channel's operator to operate such action\n", 59, 0);
 			return ;

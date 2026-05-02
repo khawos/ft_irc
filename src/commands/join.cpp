@@ -10,6 +10,12 @@ void	Channel::send_relay_message( User &user )
 
 void    Server::handleJoin(User &client, Command cmd)
 {
+	if ( cmd.params.size() < 1 )
+	{
+    	std::string errMsg = ":ircserv 461 " + client.getNickname() + " JOIN :Not enough parameters\r\n";
+    	send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
+    	return;
+	}
 	try
 	{
 		_channels.at( cmd.params[0] );
@@ -21,12 +27,14 @@ void    Server::handleJoin(User &client, Command cmd)
 		{
 			if ( cmd.params.size() != 2 )
 			{
-				send( client.getFd(), "Use : JOIN <channel> <password>\n", 33, 0);
+				std::string errMsg = ":ircserv 461 " + client.getNickname() + " JOIN :Not enough parameters : Use JOIN <channel> <password>\r\n";
+   				send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 				return;
 			}
 			else if ( cmd.params[1] != channel->getPassword() )
 			{
-				send( client.getFd(), "Wrong password try again\n", 26, 0);
+				std::string errMsg = ":ircserv 475 " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+k)\r\n";
+    			send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 				return;
 			}
 		}
@@ -47,7 +55,7 @@ void    Server::handleJoin(User &client, Command cmd)
 		if  ( cmd.params.size()  > 1 )
 			pass = cmd.params[1];
 		std::string name = cmd.params[0];
-		Channel *channel = new Channel( client.getUsername(), pass, name );
+		Channel *channel = new Channel( &client, pass, name );
 		channel->addUserInChannel( client );
 		_channels[ name ] = channel;
 		channel->send_relay_message( client );

@@ -8,6 +8,7 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 	socketAddr.sin_port = htons(_port); 		// htons is for big endian standard imposed by TCP/IP
 	socketAddr.sin_addr.s_addr = INADDR_ANY;
 
+	_serverName = "ircserv";
 	_socketFD = socket(AF_INET, SOCK_STREAM, 0); // create a socket
 	if (_socketFD == -1)
 	{

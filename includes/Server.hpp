@@ -17,13 +17,14 @@ class Server {
 
 	private:
 
-		int							_socketFD;
-		int							_port;
-		std::vector<pollfd>			_pollFds;
-		std::map<int, User *>		_users;	// clé = fd du client (PAS l'index dans _pollFds)
+		int										_socketFD;
+		int										_port;
+		std::vector<pollfd>						_pollFds;
+		std::map<int, User *>					_users;	// clé = fd du client (PAS l'index dans _pollFds)
 		std::map<std::string, Channel *>		_channels;
-		std::string					_password;
-
+		std::string								_password;	
+		std::string								_serverName;
+	
 	public:
 
 		Server();
@@ -42,5 +43,6 @@ class Server {
 		void	handleJoin(User &client, Command cmd);
 		void	handleUsername(User &client, Command cmd);
 		void    handlemode(User &client, Command cmd);
+		void    handletopic(User &client, Command cmd);
 
 };
