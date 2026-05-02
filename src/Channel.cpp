@@ -39,15 +39,15 @@ const std::string &Channel::getName() const
 	return (_name);
 }
 
-const std::map<std::string, User> &Channel::getUserMap() const
+const std::map<std::string, User&> &Channel::getUserMap() const
 {
 	return ( _Users );
 }
 
 void	Channel::sendMessage( const std::string &msg ) const
 {
-	const std::map<std::string, User>	&_User = getUserMap();
-	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
+	const std::map<std::string, User&>	&_User = getUserMap();
+	for ( std::map<std::string, User&>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
 		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
 	}
@@ -75,7 +75,7 @@ void	Channel::setInviteMode()
 		_inviteMode = false;
 }
 
-bool	Channel::getInviteMode()
+bool	Channel::getInviteMode() const
 {
 	return ( _inviteMode );
 }
@@ -88,12 +88,25 @@ void	Channel::setTopicIsOnlyOp()
 		_topicIsOnlyOP = false;
 }
 
-bool	Channel::getTopicIsOnlyOp()
+bool	Channel::getTopicIsOnlyOp() const
 {
 	return ( _topicIsOnlyOP );
 }
 
-bool	Channel::getKey()
+bool	Channel::getKey() const
 {
 	return ( _key );
+}
+
+bool	Channel::isInvited( User &user ) const
+{
+	try
+	{
+		_invitedQueueUsers.at( user );
+		return ( true );
+	}
+	catch ( std::exception )
+	{
+		return ( false );
+	}
 }

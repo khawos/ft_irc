@@ -11,8 +11,8 @@ class Channel
 {
 	private:
 
-		std::map<std::string, User>	_Users;
-		std::map<std::string, User>	_invitedQueueUsers;
+		std::map<std::string, User &>	_Users;
+		std::map<User &, bool>		_invitedQueueUsers;
 		std::string					_operator;
 		std::string					_password;
 		std::string					_name;
@@ -31,7 +31,7 @@ class Channel
 		void								deleteUserFromChannel( const User &newUSer );
 		const std::string					&getName() const;
 		std::string							getOperator( void ) const;
-		const std::map<std::string, User>	&getUserMap() const;
+		const std::map<std::string, User&>	&getUserMap() const;
 
 
 		void								sendMessage( const std::string &msg ) const;
@@ -39,11 +39,12 @@ class Channel
 
 		void								setPassword( std::string str );
 
-		std::string								getPassword();
+		bool								isInvited( User &user ) const;
+		std::string							getPassword();
 		void								setTopicIsOnlyOp();
-		bool								getTopicIsOnlyOp();
+		bool								getTopicIsOnlyOp() const;
 		void								setInviteMode();
-		bool								getInviteMode();
-		bool								getKey();
+		bool								getInviteMode() const;
+		bool								getKey() const;
 
 };
