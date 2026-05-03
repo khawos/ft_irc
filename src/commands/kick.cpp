@@ -46,7 +46,7 @@ void	Server::handleKick(User &client, Command cmd)
 	}
 
 	std::string kickMsg = ":" + client.getNickname() + "!" + client.getUsername()
-		+ "@127.0.0.1 KICK " + channelName + " " + targetNick + " :" + reason + "\r\n";
+		+ "@" + client.getIp() + " KICK " + channelName + " " + targetNick + " :" + reason + "\r\n";
 	channel->sendMessage_broadcast(kickMsg); // Informer tous les membres du channel du kick
 
 	channel->deleteUserFromChannel(*target); // Enlever le user du channel

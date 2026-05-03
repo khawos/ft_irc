@@ -50,6 +50,6 @@ void	Server::handleInvite(User &client, Command cmd)
 	send(client.getFd(), reply.c_str(), reply.size(), 0);  // Confirmation à l'inviteur
 
 	std::string inviteMsg = ":" + client.getNickname() + "!" + client.getUsername()
-		+ "@127.0.0.1 INVITE " + targetNick + " :" + channelName + "\r\n";
+		+ "@" + client.getIp() + " INVITE " + targetNick + " :" + channelName + "\r\n";
 	send(target->getFd(), inviteMsg.c_str(), inviteMsg.size(), 0); // Informer le target de l'invitation
 }

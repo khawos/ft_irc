@@ -5,11 +5,12 @@ class User
 {
     private :
 
-		int			_fd;			// file descriptor du socket client
+		int			_fd;
+		std::string	_ip;
 		std::string	_nickname;
 		std::string	_username;
 		std::string	_realname;
-		std::string	_readBuffer;	// Buffer pour read
+		std::string	_readBuffer;
 		bool		_passOk;
 		bool		_nickOk;
 		bool		_userOk;
@@ -23,6 +24,7 @@ class User
 
         // Getters
 		int					getFd() const;
+		const std::string&	getIp() const;
 		const std::string&	getNickname() const;
 		const unsigned int&	getId() const;
 		const std::string&	getUsername() const;
@@ -33,6 +35,7 @@ class User
 		bool				isRegistered() const;
 
 		// Setters
+		void	setIp(const std::string& ip);
 		void	setNickname(const std::string& nick);
 		void	setUsername(const std::string& user);
 		void	setRealname(const std::string& real);

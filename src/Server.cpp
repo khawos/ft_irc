@@ -1,4 +1,5 @@
 #include "../includes/Server.hpp"
+#include <arpa/inet.h>
 
 Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _port(port), _password(password)
 {
@@ -74,11 +75,13 @@ void	Server::runServer()
 			{
 				if (_pollFds[i].fd == _socketFD)
 				{
-					int client_fd = accept(_socketFD, NULL, NULL);
+					struct sockaddr_in clientAddr;
+					socklen_t clientAddrLen = sizeof(clientAddr);
+					int client_fd = accept(_socketFD, (struct sockaddr *)&clientAddr, &clientAddrLen); // accepter catch l'ip du client qui se connecte
 					if (client_fd != -1)
 					{
-						// On stocke par fd, 
-						_users[client_fd] = newUserConnexion(client_fd);
+						std::string ip = inet_ntoa(clientAddr.sin_addr);	// Convertir l'adresse IPv4 en string
+						_users[client_fd] = newUserConnexion(client_fd, ip);
 					}
 					else
 						std::cerr << "Accept failed" << std::endl;
@@ -119,11 +122,10 @@ void	Server::disconnectClient( size_t pollIndex )
 	_pollFds.erase(_pollFds.begin() + pollIndex);
 }
 
-User	*Server::newUserConnexion( int client_fd )
+User	*Server::newUserConnexion( int client_fd, const std::string &ip )
 {
-	std::cout << "New client connected! (fd=" << client_fd << ")" << std::endl;
+	std::cout << "New client connected! (fd=" << client_fd << ", ip=" << ip << ")" << std::endl;
 
-	// fcntl(fd, F_SETFL, O_NONBLOCK)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
 	pollfd clientPoll = {};
@@ -131,7 +133,8 @@ User	*Server::newUserConnexion( int client_fd )
 	clientPoll.events = POLLIN;
 	_pollFds.push_back(clientPoll);
 
-	User *newUser = new User(client_fd);  // on passe le fd comme id et fd
+	User *newUser = new User(client_fd);
+	newUser->setIp(ip);
 	return newUser;
 }
 
@@ -193,7 +196,7 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleUsername(client, cmd);
 	else if (!client.isRegistered())
 	{
-		send(client.getFd(), "Register first : USER and NICK\n", 38, 0);
+		send(client.getFd(), "Register first : USER and NICK\n", 32, 0);
 		return ;
 	}
 	else if (cmd.name == "JOIN")

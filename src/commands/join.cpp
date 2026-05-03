@@ -11,7 +11,7 @@
  */
 void	Channel::send_relay_message( User &user )
 {
-	std::string msg = ":" + user.getUsername() + "!127.0.0.1" + "JOIN :" + getName() + "\r\n";
+	std::string msg = ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIp() + " JOIN :" + getName() + "\r\n";
 	const std::map<std::string, User>	&_User = getUserMap();
 	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
@@ -73,13 +73,14 @@ void    Server::handleJoin(User &client, Command cmd)
 			return ;
 		}
 		channel->addUserInChannel( client );
-		channel->send_relay_message( client);
+		channel->send_relay_message( client );
 		channel->incNbUSer();
+		sendNamesAfterJoin( client, channel );
 	}
 	catch(const std::exception& e)
 	{
 		std::string pass = "";
-		if  ( cmd.params.size()  > 1 )
+		if  ( cmd.params.size() > 1 )
 			pass = cmd.params[1];
 		std::string name = cmd.params[0];
 		Channel *channel = new Channel( &client, pass, name );
@@ -87,5 +88,24 @@ void    Server::handleJoin(User &client, Command cmd)
 		channel->incNbUSer();
 		_channels[ name ] = channel;
 		channel->send_relay_message( client );
-	}	
+		sendNamesAfterJoin( client, channel );
+	}
+}
+
+void	Server::sendNamesAfterJoin( User &client, Channel *channel )
+{
+	std::string namesList = "";
+	const std::map<std::string, User> &members = channel->getUserMap();
+	for (std::map<std::string, User>::const_iterator it = members.begin(); it != members.end(); it++)
+	{
+		if (!namesList.empty())
+			namesList += " ";
+		if (channel->isOperator(it->second))
+			namesList += "@";
+		namesList += it->second.getNickname();
+	}
+	std::string msg353 = ":" + _serverName + " 353 " + client.getNickname() + " = " + channel->getName() + " :" + namesList + "\r\n";
+	std::string msg366 = ":" + _serverName + " 366 " + client.getNickname() + " " + channel->getName() + " :End of /NAMES list\r\n";
+	send(client.getFd(), msg353.c_str(), msg353.size(), 0);
+	send(client.getFd(), msg366.c_str(), msg366.size(), 0);
 }

@@ -4,7 +4,7 @@ void Server::sendWelcomeMessages(User& client) {
     
     std::string nick = client.getNickname();
     std::string user = client.getUsername();
-    std::string ip = "127.0.0.1";
+    std::string ip = client.getIp();
     
     std::string welcomeMsg = "";
     

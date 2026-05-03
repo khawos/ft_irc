@@ -166,7 +166,7 @@ std::string	Channel::getTopic()
 
 void	Channel::promoteOp( User *admin, User *toPromote )
 {
-	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@127.0.0.1";
+	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@" + admin->getIp();
 	std::string broadcastMsg = ":" + prefix + " MODE " + getName() + " +o " + toPromote->getNickname() + "\r\n";
 	sendMessage_broadcast( broadcastMsg );
 	_operator.push_back( toPromote );
@@ -174,7 +174,7 @@ void	Channel::promoteOp( User *admin, User *toPromote )
 
 void	Channel::demoteOp( User *admin, User *toDemote )
 {
-	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@127.0.0.1";
+	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@" + admin->getIp();
 	std::string broadcastMsg = ":" + prefix + " MODE " + getName() + " -o " + toDemote->getNickname() + "\r\n";
 	for (std::vector<User *>::iterator it = _operator.begin(); it != _operator.end() ; it++ )
 	{

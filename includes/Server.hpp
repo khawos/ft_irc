@@ -30,7 +30,7 @@ class Server {
 		Server();
 		Server( int, int &, std::string );
 		~Server();
-		User	*newUserConnexion( int client_fd );
+		User	*newUserConnexion( int client_fd, const std::string &ip );
 		void	runServer();
 		void	handleCommand( std::string, std::vector<std::string>, int );
 		void	handleConnexion( std::vector<std::string> args, int fd );
@@ -49,6 +49,7 @@ class Server {
 		void	handleInvite(User &client, Command cmd);
 
 		void	sendWelcomeMessages( User &client );
+		void	sendNamesAfterJoin( User &client, Channel *channel );
 
 		bool	isUser( std::string userNickName );
 		User	*getUser( std::string nickname ) const;

@@ -33,6 +33,7 @@ bool	User::extractCommand(std::string& outLine)
 
 // Getters
 int					User::getFd() const            { return _fd; }
+const std::string&	User::getIp() const            { return _ip; }
 const std::string&	User::getUsername() const      { return _username; }
 const std::string&	User::getRealname() const      { return _realname; }
 const std::string&	User::getNickname() const      { return _nickname; }
@@ -42,6 +43,7 @@ bool				User::isUserOk() const         { return _userOk; }
 bool				User::isRegistered() const     { return _registered; }
 
 // Setters
+void	User::setIp(const std::string& ip)         { _ip = ip; }
 void	User::setNickname(const std::string& nick) { _nickname = nick; }
 void	User::setUsername(const std::string& user) { _username = user; }
 void	User::setRealname(const std::string& real) { _realname = real; }
