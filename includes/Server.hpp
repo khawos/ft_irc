@@ -45,6 +45,8 @@ class Server {
 		void    handlemode(User &client, Command cmd);
 		void    handletopic(User &client, Command cmd);
 		void	handlePrivmsg(User &client, Command cmd);
+		void	handleKick(User &client, Command cmd);
+		void	handleInvite(User &client, Command cmd);
 
 		void	sendWelcomeMessages( User &client );
 

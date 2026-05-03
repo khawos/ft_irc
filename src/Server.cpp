@@ -77,7 +77,7 @@ void	Server::runServer()
 					int client_fd = accept(_socketFD, NULL, NULL);
 					if (client_fd != -1)
 					{
-						// On stocke par fd, pas par index !
+						// On stocke par fd, 
 						_users[client_fd] = newUserConnexion(client_fd);
 					}
 					else
@@ -123,7 +123,7 @@ User	*Server::newUserConnexion( int client_fd )
 {
 	std::cout << "New client connected! (fd=" << client_fd << ")" << std::endl;
 
-	// fcntl correct : fcntl(fd, F_SETFL, O_NONBLOCK)
+	// fcntl(fd, F_SETFL, O_NONBLOCK)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
 	pollfd clientPoll;
@@ -204,6 +204,10 @@ void	Server::processCommand(User& client, const std::string& line)
 		handlePrivmsg(client, cmd);
 	else if (cmd.name == "TOPIC")
 		handletopic(client, cmd);
+	else if (cmd.name == "KICK")
+		handleKick(client, cmd);
+	else if (cmd.name == "INVITE")
+		handleInvite(client, cmd);
 // 	else if (cmd.name == "PING")
 // 		handlePing(client, cmd);
 // 	else if (cmd.name == "QUIT")

@@ -34,6 +34,7 @@ class Channel
 
 		void								addUserInChannel( const User &newUSer );
 		void								deleteUserFromChannel( const User &newUSer );
+		void								addToInviteList( const User &user );
 		const std::string					&getName() const;
 		bool								isOperator( const User &client ) const;
 		const std::map<std::string, User>	&getUserMap() const;

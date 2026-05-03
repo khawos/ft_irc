@@ -93,6 +93,7 @@ void    Server::handlemode(User &client, Command cmd)
 	catch( const std::exception& e )
 	{
 		send( client.getFd(), "Use : MODE <channel> <flags>\n", 30, 0 );
+		send( client.getFd(), "ERROR:MODE <channel> <flags>\n", 30, 0 );
 		return ;
 	}
 

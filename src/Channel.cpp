@@ -23,16 +23,16 @@ void	Channel::addUserInChannel( const User &newUser )
 
 void	Channel::deleteUserFromChannel( const User &userToDelete )
 {
-	std::string	name = userToDelete.getNickname();
-	try
-	{
-		_Users.at( name );
-		_Users.erase( name );
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << name << " is not a member of " << this->_name << '\n';
-	}
+	std::string	name = userToDelete.getUsername();
+	if (_Users.count(name))
+		_Users.erase(name);
+	else
+		std::cerr << userToDelete.getNickname() << " is not a member of " << this->_name << '\n';
+}
+
+void	Channel::addToInviteList( const User &user )
+{
+	_invitedQueueUsers[user.getUsername()] = true; 
 }
 
 bool	Channel::isOperator( const User &client ) const
