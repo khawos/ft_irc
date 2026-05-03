@@ -40,7 +40,7 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 		return ;
 	}
 
-	pollfd serverPoll;
+	pollfd serverPoll = {};
 	serverPoll.fd = _socketFD;
 	serverPoll.events = POLLIN;
 	_pollFds.push_back(serverPoll);
@@ -126,7 +126,7 @@ User	*Server::newUserConnexion( int client_fd )
 	// fcntl(fd, F_SETFL, O_NONBLOCK)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
-	pollfd clientPoll;
+	pollfd clientPoll = {};
 	clientPoll.fd = client_fd;
 	clientPoll.events = POLLIN;
 	_pollFds.push_back(clientPoll);
