@@ -11,11 +11,11 @@
  */
  void Server::handleUsername(User &client, Command cmd)
 {
-	if ( cmd.params.size() != 1 )
-	{
-		send(client.getFd(), "Use USER <username>\n", 21, 0);
-	}
-	else if ( client.isUserOk() != true )
+	// if ( cmd.params.size() != 1 )
+	// {
+	// 	send(client.getFd(), "Use USER <username>\n", 21, 0);
+	// }
+	if ( client.isUserOk() != true )
 	{
 		client.setUsername(cmd.params[0]);
         client.setUserOk( true );

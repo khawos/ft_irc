@@ -14,7 +14,7 @@ void Server::handleNick(User &client, Command cmd)
 	{
 		send(client.getFd(), "Use NICK <nickname>\n", 21, 0);
 	}
-	else if ( client.isNickOk() != true )
+	else
 	{
 		client.setNickname(cmd.params[0]);
 		client.setNickOk( true );

@@ -160,7 +160,6 @@ void	Server::handleUserData(size_t pollIndex)
 		return;
 	}
 	User *user = _users[fd];
-	std::cout << buffer << std::endl;
 	user->appendToReadBuffer(std::string(buffer, bytes));
 	std::string	line;
 	while (user->extractCommand(line))
@@ -177,25 +176,26 @@ void	Server::processCommand(User& client, const std::string& line)
 	if (cmd.name.empty())
 		return;
 
-	//std::cout << "[PARSED] name=" << cmd.name << " params=";
-	//for (size_t i = 0; i < cmd.params.size(); i++)
-	//	std::cout << "[" << cmd.params[i] << "] ";
-	//std::cout << std::endl;
+	std::cout << "[PARSED] name=" << cmd.name << " params=";
+	for (size_t i = 0; i < cmd.params.size(); i++)
+		std::cout << "[" << cmd.params[i] << "] ";
+	std::cout << std::endl;
 
 	// Dispatcher
-	
+
+	if ( cmd.name == "CAP" )
+	{
+	    std::string reply = "CAP * LS :\r\n";
+	    send(client.getFd(), reply.c_str(), reply.length(), 0);
+	    return ;
+	}
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
-	else if ( client.isPassOk() != true )
-	{
-		send(client.getFd(), "Enter the password : PASS <password>\n", 38, 0);
-		return ;
-	}
  	else if (cmd.name == "NICK")
  		handleNick(client, cmd);
 	else if (cmd.name == "USER")
 		handleUsername(client, cmd);
-	else if (!client.isRegistered())
+	else if (!client.isRegistered() && client.isPassOk() != true )
 	{
 		send(client.getFd(), "Register first : USER and NICK\n", 32, 0);
 		return ;
@@ -212,28 +212,6 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleKick(client, cmd);
 	else if (cmd.name == "INVITE")
 		handleInvite(client, cmd);
-// 	else if (cmd.name == "PING")
-// 		handlePing(client, cmd);
-// 	else if (cmd.name == "QUIT")
-// 		handleQuit(client, cmd);
-// 	else if (cmd.name == "CAP")
-// 	{
-// 		// Minimal CAP handling for clients like HexChat
-// 		if (!cmd.params.empty() && cmd.params[0] == "LS")
-// 			sendToClient(client, ":server CAP * LS :\r\n");
-// 		// LIST / REQ / END: silently ignored
-// 	}
-// 	else
-// 	{
-// 		// Not registered yet — many commands are blocked
-// 		if (!client.isRegistered())
-// 		{
-// 			std::string nick = client.getNickname().empty() ? "*" : client.getNickname();
-// 			sendToClient(client, ":server 451 " + nick + " :You have not registered\r\n");
-// 		}
-// 		else
-// 		{
-// 			sendToClient(client, ":server 421 " + client.getNickname() + " " + cmd.name + " :Unknown command\r\n");
-// 		}
-// 	}
+	else if (cmd.name == "PING")
+		handlePing(client, cmd);
 }

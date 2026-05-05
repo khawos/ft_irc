@@ -17,7 +17,7 @@ Channel::~Channel(){}
 
 void	Channel::addUserInChannel( const User &newUser )
 {
-	_Users[ newUser.getUsername()] = newUser;			
+	_Users[ newUser.getUsername() ] = newUser;			
 
 }
 
@@ -39,7 +39,7 @@ bool	Channel::isOperator( const User &client ) const
 {
 	for (std::vector< User * >::const_iterator it = _operator.begin(); it != _operator.end(); it++ )
 	{
-		if ( client.getNickname() == (*it)->getNickname() )
+		if ( client.getUsername() == (*it)->getUsername() )
 		{
 			return ( true );
 		}
@@ -59,6 +59,7 @@ const std::map<std::string, User> &Channel::getUserMap() const
 
 void	Channel::sendMessage( const std::string &msg, User client ) const
 {
+	std::cout << "Message : " <<  msg << std::endl;
 	const std::map<std::string, User>	&_User = getUserMap();
 	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{

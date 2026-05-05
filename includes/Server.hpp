@@ -47,6 +47,7 @@ class Server {
 		void	handlePrivmsg(User &client, Command cmd);
 		void	handleKick(User &client, Command cmd);
 		void	handleInvite(User &client, Command cmd);
+		void	handlePing(User &client, Command cmd);
 
 		void	sendWelcomeMessages( User &client );
 		void	sendNamesAfterJoin( User &client, Channel *channel );

@@ -25,7 +25,7 @@ void	Server::handlePrivmsg(User &client, Command cmd)
 	}
 	std::string target = cmd.params[0];
 	std::string message = cmd.params[1];
-	std::string fullMsg = ":" + client.getNickname() + "." + client.getUsername() + "PRIVMSG " + target + " :" + message + "\r\n";
+	std::string fullMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getIp() +" PRIVMSG " + target + " :" + message + "\r\n";	
 	if (target[0] == '#')
 	{
 		std::cout << "Message : " << fullMsg << " Channel : " << target << std::endl;

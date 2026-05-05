@@ -77,8 +77,9 @@ void    Server::handleJoin(User &client, Command cmd)
 		channel->incNbUSer();
 		sendNamesAfterJoin( client, channel );
 	}
-	catch(const std::exception& e)
+	catch( const std::exception& e )
 	{
+		std::cout << "New channel" << std::endl;
 		std::string pass = "";
 		if  ( cmd.params.size() > 1 )
 			pass = cmd.params[1];

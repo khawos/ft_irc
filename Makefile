@@ -19,6 +19,7 @@ SRC = main.cpp \
 	commands/nick.cpp \
 	commands/join.cpp \
 	commands/inivite.cpp \
+	commands/pong.cpp \
 	utils_server.cpp
 
 # Sources avec préfixe src/
