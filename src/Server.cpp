@@ -160,7 +160,7 @@ void	Server::handleUserData(size_t pollIndex)
 		return;
 	}
 	User *user = _users[fd];
-
+	std::cout << buffer << std::endl;
 	user->appendToReadBuffer(std::string(buffer, bytes));
 	std::string	line;
 	while (user->extractCommand(line))
@@ -177,12 +177,13 @@ void	Server::processCommand(User& client, const std::string& line)
 	if (cmd.name.empty())
 		return;
 
-	std::cout << "[PARSED] name=" << cmd.name << " params=";
-	for (size_t i = 0; i < cmd.params.size(); i++)
-		std::cout << "[" << cmd.params[i] << "] ";
-	std::cout << std::endl;
+	//std::cout << "[PARSED] name=" << cmd.name << " params=";
+	//for (size_t i = 0; i < cmd.params.size(); i++)
+	//	std::cout << "[" << cmd.params[i] << "] ";
+	//std::cout << std::endl;
 
 	// Dispatcher
+	
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
 	else if ( client.isPassOk() != true )
