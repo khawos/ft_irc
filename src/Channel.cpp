@@ -187,6 +187,7 @@ void	Channel::demoteOp( User *admin, User *toDemote )
 {
 	std::string prefix = admin->getNickname() + "!" + admin->getUsername() + "@" + admin->getIp();
 	std::string broadcastMsg = ":" + prefix + " MODE " + getName() + " -o " + toDemote->getNickname() + "\r\n";
+	sendMessage_broadcast( broadcastMsg );
 	for (std::vector<User *>::iterator it = _operator.begin(); it != _operator.end() ; it++ )
 	{
 		if ((*it)->getNickname() == toDemote->getNickname())

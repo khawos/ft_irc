@@ -12,7 +12,6 @@
  */
 void    Server::handlemode(User &client, Command cmd)
 {
-	return ;
 	if ( cmd.params.size() < 2 )
 	{
 		return ;
@@ -27,6 +26,7 @@ void    Server::handlemode(User &client, Command cmd)
 			return ;
 		}
 		std::string	option = cmd.params[1];
+		std::cout << option << std::endl; 
 		if ( option == "-i" )
 			channel->setInviteMode( false );
 		else if ( option == "+i")
@@ -41,8 +41,9 @@ void    Server::handlemode(User &client, Command cmd)
 			{
 				// error
 			}
-			else if ( cmd.params.size() != 3 && option == "+k" )
+			else if ( cmd.params.size() == 3 && option == "+k" )
 			{
+				std::cout << "SetPassword " + cmd.params[2] + " " + channel->getName() << std::endl;
 				channel->setPassword( cmd.params[2] );
 				channel->setKey( true );
 			}
@@ -92,6 +93,7 @@ void    Server::handlemode(User &client, Command cmd)
 	}
 	catch( const std::exception& e )
 	{
+		std::cout << " THROW" << std::endl;
 		// send( client.getFd(), "Use : MODE <channel> <flags>\n", 30, 0 );
 		// send( client.getFd(), "ERROR:MODE <channel> <flags>\n", 30, 0 );
 		return ;
