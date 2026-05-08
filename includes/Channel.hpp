@@ -5,13 +5,13 @@
 # include "User.hpp" // User
 # include <vector>
 # include <sys/socket.h> // send()
-
+#include <utility> // std::pair
 
 class Channel
 {
 	private:
 
-		std::map<std::string, User >	_Users;
+		std::map<std::string, User* >	_Users;
 		std::map<std::string, bool>		_invitedQueueUsers;
 		std::vector<User *>				_operator;
 		std::string						_password;
@@ -32,12 +32,12 @@ class Channel
 		~Channel();
 
 
-		void								addUserInChannel( const User &newUSer );
+		void								addUserInChannel( User *newUSer );
 		void								deleteUserFromChannel( const User &newUSer );
 		void								addToInviteList( const User &user );
 		const std::string					&getName() const;
 		bool								isOperator( const User &client ) const;
-		const std::map<std::string, User>	&getUserMap() const;
+		const std::map<std::string, User*>	&getUserMap() const;
 
 
 		void								sendMessage( const std::string &msg, User client ) const;
@@ -65,5 +65,6 @@ class Channel
 
 		void								promoteOp( User *admin, User *toPromote );
 		void								demoteOp( User *admin, User *toDemote );
+		bool								isUserInChannel( const User &user ) const;
 
 };

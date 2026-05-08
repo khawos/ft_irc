@@ -36,8 +36,7 @@ void	Server::handlePrivmsg(User &client, Command cmd)
 			return;
 		}
 		Channel	*channel = _channels[ target ];
-		const std::map<std::string, User> &members = channel->getUserMap();
-		if (members.find(client.getUsername()) == members.end())	// client n'est pas dans le channel
+		if (!channel->isUserInChannel(client))
 		{
 			std::string err = ":" + _serverName + " 442 " + client.getNickname() + " " + target + " :You're not on that channel\r\n";
 			send(client.getFd(), err.c_str(), err.size(), 0);

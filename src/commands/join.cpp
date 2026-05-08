@@ -12,9 +12,9 @@
 void	Channel::send_relay_message( User &user )
 {
 	std::string msg = ":" + user.getNickname() + "!" + user.getUsername() + "@" + user.getIp() + " JOIN :" + getName() + "\r\n";
-	const std::map<std::string, User>	&_User = getUserMap();
-	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
-		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
+	const std::map<std::string, User*>	&_User = getUserMap();
+	for ( std::map<std::string, User*>::const_iterator it = _User.begin(); it != _User.end(); it++ )
+		send(it->second->getFd(), msg.c_str(), msg.size(), 0);
 }
 
 /**
@@ -72,7 +72,7 @@ void    Server::handleJoin(User &client, Command cmd)
 			send( client.getFd(), "This channel is an invite only channel\n", 40, 0);
 			return ;
 		}
-		channel->addUserInChannel( client );
+		channel->addUserInChannel( _users[ client.getFd() ] );
 		channel->send_relay_message( client );
 		channel->incNbUSer();
 		sendNamesAfterJoin( client, channel );
@@ -85,28 +85,30 @@ void    Server::handleJoin(User &client, Command cmd)
 			pass = cmd.params[1];
 		std::string name = cmd.params[0];
 		Channel *channel = new Channel( &client, pass, name );
-		channel->addUserInChannel( client );
-		channel->incNbUSer();
 		_channels[ name ] = channel;
+		channel->addUserInChannel( _users[ client.getFd() ] );
+		channel->incNbUSer();
 		channel->send_relay_message( client );
+		sendNamesAfterJoin( client, channel );
 	}
 }
 
 void	Server::sendNamesAfterJoin( User &client, Channel *channel )
 {
 	std::string namesList = "";
-	const std::map<std::string, User> &members = channel->getUserMap();
-	for (std::map<std::string, User>::const_iterator it = members.begin(); it != members.end(); it++)
+	const std::map<std::string, User*> &members = channel->getUserMap();
+	for (std::map<std::string, User*>::const_iterator it = members.begin(); it != members.end(); it++)
 	{
 		if (!namesList.empty())
 			namesList += " ";
-		if (channel->isOperator(it->second))
+		if (channel->isOperator(*it->second))
 			namesList += "@";
-		namesList += it->second.getNickname();
+		namesList += it->second->getNickname();
 	}
 	std::string msg332 = ":" + _serverName + " 332 " + client.getNickname() + " " + channel->getName() + " :" + channel->getTopic() + "\r\n";
 	std::string msg353 = ":" + _serverName + " 353 " + client.getNickname() + " = " + channel->getName() + " :" + namesList + "\r\n";
 	std::string msg366 = ":" + _serverName + " 366 " + client.getNickname() + " " + channel->getName() + " :End of NAMES list\r\n";
+	std::cout << "send name list to " <<  client.getFd() << " " << namesList << std::endl;
 	send(client.getFd(), msg332.c_str(), msg332.size(), 0);
 	send(client.getFd(), msg353.c_str(), msg353.size(), 0);
 	send(client.getFd(), msg366.c_str(), msg366.size(), 0);

@@ -1,4 +1,5 @@
 #include "../includes/Channel.hpp"
+#include <sstream>
 
 Channel::Channel(){}
 
@@ -15,15 +16,19 @@ Channel::Channel( User *op, std::string pass, std::string name) : _name(name), _
 
 Channel::~Channel(){}
 
-void	Channel::addUserInChannel( const User &newUser )
+void	Channel::addUserInChannel(  User *newUser )
 {
-	_Users[ newUser.getUsername() ] = newUser;			
+	std::stringstream ss;
+	ss << newUser->getFd();
+	_Users [ ss.str() ] = newUser;			
 
 }
 
 void	Channel::deleteUserFromChannel( const User &userToDelete )
 {
-	std::string	name = userToDelete.getUsername();
+	std::stringstream ss;
+	ss << userToDelete.getFd();
+	std::string	name = ss.str();
 	if (_Users.count(name))
 		_Users.erase(name);
 	else
@@ -39,7 +44,7 @@ bool	Channel::isOperator( const User &client ) const
 {
 	for (std::vector< User * >::const_iterator it = _operator.begin(); it != _operator.end(); it++ )
 	{
-		if ( client.getUsername() == (*it)->getUsername() )
+		if ( client.getNickname() == (*it)->getNickname() )
 		{
 			return ( true );
 		}
@@ -52,28 +57,33 @@ const std::string &Channel::getName() const
 	return (_name);
 }
 
-const std::map<std::string, User> &Channel::getUserMap() const
+const std::map<std::string, User*> &Channel::getUserMap() const
 {
 	return ( _Users );
 }
 
 void	Channel::sendMessage( const std::string &msg, User client ) const
 {
-	std::cout << "Message : " <<  msg << std::endl;
-	const std::map<std::string, User>	&_User = getUserMap();
-	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
+	const std::map<std::string, User*>	&_User = getUserMap();
+	std::cout << "Send in" << std::endl;
+	for ( std::map<std::string, User*>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
-		if ( it->second.getNickname() != client.getNickname() )
-			send(it->second.getFd(), msg.c_str(), msg.size(), 0);
+		if ( it->second->getNickname() != client.getNickname() )
+		{
+			send(it->second->getFd(), msg.c_str(), msg.size(), 0);
+			std::cout << "to : " << it->second->getFd() << std::endl;
+		}
 	}
+	std::cout << "Send out" << std::endl;
 }
 
 void	Channel::sendMessage_broadcast( const std::string &msg ) const
 {
-	const std::map<std::string, User>	&_User = getUserMap();
-	for ( std::map<std::string, User>::const_iterator it = _User.begin(); it != _User.end(); it++ )
+	const std::map<std::string, User*>	&_User = getUserMap();
+	for ( std::map<std::string, User*>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
-		send(it->second.getFd(), msg.c_str(), msg.size(), 0);
+		send(it->second->getFd(), msg.c_str(), msg.size(), 0);
+		std::cout << "to : " << it->second->getFd() << std::endl;
 	}
 }
 
@@ -186,4 +196,11 @@ void	Channel::demoteOp( User *admin, User *toDemote )
 		}
 	}
 
+}
+
+bool	Channel::isUserInChannel( const User &user ) const
+{
+	std::stringstream ss;
+	ss << user.getFd();
+	return _Users.count(ss.str()) > 0;
 }

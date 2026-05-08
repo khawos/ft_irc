@@ -37,8 +37,7 @@ void	Server::handleKick(User &client, Command cmd)
 		return;
 	}
 
-	const std::map<std::string, User> &members = channel->getUserMap();
-	if (members.find(target->getUsername()) == members.end()) // target n'est pas dans le channel
+	if (!channel->isUserInChannel(*target)) // target n'est pas dans le channel
 	{
 		std::string err = ":" + _serverName + " 441 " + client.getNickname() + " " + targetNick + " " + channelName + " :They aren't on that channel\r\n";
 		send(client.getFd(), err.c_str(), err.size(), 0);

@@ -19,8 +19,7 @@ void    Server::handletopic( User &client, Command cmd )
 	{
 		_channels.at( cmd.params[0]) ;
 		Channel *channel = _channels[ cmd.params[0] ];
-		const std::map<std::string, User> &members = channel->getUserMap();
-		if (members.find(client.getUsername()) == members.end())	 // client n'est pas dans le channel
+		if (!channel->isUserInChannel(client))
 		{
 			std::string err = ":" + _serverName + " 442 " + client.getNickname() + " " + channel->getName() + " :You're not on that channel\r\n";
 			send(client.getFd(), err.c_str(), err.size(), 0);

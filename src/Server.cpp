@@ -191,7 +191,6 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleUsername(client, cmd);
 	else if (!client.isRegistered() && client.isPassOk() != true )
 	{
-		//send(client.getFd(), "Register first : USER and NICK\n", 32, 0);
 		return ;
 	}
 	else if (cmd.name == "JOIN")

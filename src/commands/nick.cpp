@@ -1,16 +1,5 @@
 #include "../../includes/Server.hpp"
 
-bool Server::nickIsAlreadyTaken( std::string nick )
-{
-	std::map<int, User *>::const_iterator	it = _users.begin();
-
-	for ( ; it != _users.end(); it++ )
-	{
-		if ( it->second->getNickname() == nick )
-			return ( true );
-	}
-	return (false);
-}
 
 /**
  * @author			Jbayeonne

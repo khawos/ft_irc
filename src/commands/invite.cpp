@@ -36,8 +36,7 @@ void	Server::handleInvite(User &client, Command cmd)
 		return;
 	}
 
-	const std::map<std::string, User> &members = channel->getUserMap();
-	if (members.find(target->getUsername()) != members.end()) // target est déjà dans le channel
+	if (channel->isUserInChannel(*target)) // target est déjà dans le channel
 	{
 		std::string err = ":" + _serverName + " 443 " + client.getNickname() + " " + targetNick + " " + channelName + " :is already on channel\r\n";
 		send(client.getFd(), err.c_str(), err.size(), 0);

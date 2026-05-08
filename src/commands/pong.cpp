@@ -14,6 +14,8 @@ void    Server::handlePing(User &client, Command cmd)
     if (!token.empty() && token[token.length() - 1] == '\r') {
         token.erase(token.length() - 1);
     }
-    std::string inviteMsg = "PONG: " + token;
-    send(client.getFd(), inviteMsg.c_str(), inviteMsg.length(), 0);
+    std::string pongMsg = ":" + _serverName + " PONG " + _serverName + " " + token + "\r\n";
+    send(client.getFd(), pongMsg.c_str(), pongMsg.length(), 0);
+	std::cout << "to (pong) : " << client.getFd() << std::endl;
+
 }
