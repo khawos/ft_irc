@@ -37,7 +37,7 @@ void	Channel::deleteUserFromChannel( const User &userToDelete )
 
 void	Channel::addToInviteList( const User &user )
 {
-	_invitedQueueUsers[user.getUsername()] = true; 
+	_invitedQueueUsers[user.getNickname()] = true; 
 }
 
 bool	Channel::isOperator( const User &client ) const
@@ -156,7 +156,7 @@ bool	Channel::isInvited( User user_ ) const
 {
 	try
 	{
-		_invitedQueueUsers.at( user_.getUsername() );
+		_invitedQueueUsers.at( user_.getNickname() );
 		return ( true );
 	}
 	catch ( std::exception &e)

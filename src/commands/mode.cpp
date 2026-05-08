@@ -43,7 +43,6 @@ void    Server::handlemode(User &client, Command cmd)
 			}
 			else if ( cmd.params.size() == 3 && option == "+k" )
 			{
-				std::cout << "SetPassword " + cmd.params[2] + " " + channel->getName() << std::endl;
 				channel->setPassword( cmd.params[2] );
 				channel->setKey( true );
 			}

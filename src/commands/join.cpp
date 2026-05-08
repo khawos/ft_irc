@@ -53,7 +53,7 @@ void    Server::handleJoin(User &client, Command cmd)
 		{
 			if ( cmd.params.size() != 2 )
 			{
-				std::string errMsg = ":ircserv 461 " + client.getNickname() + " JOIN :Not enough parameters : Use JOIN <channel> <password>\r\n";
+				std::string errMsg = ":" + _serverName + " 475 " + client.getNickname() + " " + cmd.params[0] + " :Cannot join channel (+k)\r\n";
    				send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 				return;
 			}
@@ -69,7 +69,8 @@ void    Server::handleJoin(User &client, Command cmd)
 		 */
 		if ( channel->getInviteMode() == true && channel->isInvited( client ) == false )
 		{
-			send( client.getFd(), "This channel is an invite only channel\n", 40, 0);
+			std::string errMsg = ":" + _serverName + " 473 " + client.getNickname() + " " + channel->getName() + " :Cannot join channel (+i)\r\n";
+			send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 			return ;
 		}
 		channel->addUserInChannel( _users[ client.getFd() ] );
@@ -108,7 +109,6 @@ void	Server::sendNamesAfterJoin( User &client, Channel *channel )
 	std::string msg332 = ":" + _serverName + " 332 " + client.getNickname() + " " + channel->getName() + " :" + channel->getTopic() + "\r\n";
 	std::string msg353 = ":" + _serverName + " 353 " + client.getNickname() + " = " + channel->getName() + " :" + namesList + "\r\n";
 	std::string msg366 = ":" + _serverName + " 366 " + client.getNickname() + " " + channel->getName() + " :End of NAMES list\r\n";
-	std::cout << "send name list to " <<  client.getFd() << " " << namesList << std::endl;
 	send(client.getFd(), msg332.c_str(), msg332.size(), 0);
 	send(client.getFd(), msg353.c_str(), msg353.size(), 0);
 	send(client.getFd(), msg366.c_str(), msg366.size(), 0);
