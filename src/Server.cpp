@@ -183,12 +183,6 @@ void	Server::processCommand(User& client, const std::string& line)
 
 	// Dispatcher
 
-	if ( cmd.name == "CAP" )
-	{
-	    std::string reply = "CAP * LS :\r\n";
-	    send(client.getFd(), reply.c_str(), reply.length(), 0);
-	    return ;
-	}
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
  	else if (cmd.name == "NICK")
@@ -197,7 +191,7 @@ void	Server::processCommand(User& client, const std::string& line)
 		handleUsername(client, cmd);
 	else if (!client.isRegistered() && client.isPassOk() != true )
 	{
-		send(client.getFd(), "Register first : USER and NICK\n", 32, 0);
+		//send(client.getFd(), "Register first : USER and NICK\n", 32, 0);
 		return ;
 	}
 	else if (cmd.name == "JOIN")

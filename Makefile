@@ -18,7 +18,7 @@ SRC = main.cpp \
 	commands/kick.cpp \
 	commands/nick.cpp \
 	commands/join.cpp \
-	commands/inivite.cpp \
+	commands/invite.cpp \
 	commands/pong.cpp \
 	utils_server.cpp
 

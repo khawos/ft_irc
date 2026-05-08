@@ -89,7 +89,6 @@ void    Server::handleJoin(User &client, Command cmd)
 		channel->incNbUSer();
 		_channels[ name ] = channel;
 		channel->send_relay_message( client );
-		sendNamesAfterJoin( client, channel );
 	}
 }
 
@@ -105,8 +104,10 @@ void	Server::sendNamesAfterJoin( User &client, Channel *channel )
 			namesList += "@";
 		namesList += it->second.getNickname();
 	}
+	std::string msg332 = ":" + _serverName + " 332 " + client.getNickname() + " " + channel->getName() + " :" + channel->getTopic() + "\r\n";
 	std::string msg353 = ":" + _serverName + " 353 " + client.getNickname() + " = " + channel->getName() + " :" + namesList + "\r\n";
-	std::string msg366 = ":" + _serverName + " 366 " + client.getNickname() + " " + channel->getName() + " :End of /NAMES list\r\n";
+	std::string msg366 = ":" + _serverName + " 366 " + client.getNickname() + " " + channel->getName() + " :End of NAMES list\r\n";
+	send(client.getFd(), msg332.c_str(), msg332.size(), 0);
 	send(client.getFd(), msg353.c_str(), msg353.size(), 0);
 	send(client.getFd(), msg366.c_str(), msg366.size(), 0);
 }

@@ -22,6 +22,5 @@ void    Server::handlePass(User &client, Command cmd)
 	else if ( cmd.params[0] == _password )
 	{
 		client.setPassOk( true );
-		send(client.getFd(), "Succesfully Connected\n", 23, 0);
 	}
 }

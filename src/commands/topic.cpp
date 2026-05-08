@@ -40,7 +40,7 @@ void    Server::handletopic( User &client, Command cmd )
 		}
 		if ( channel->getTopicIsOnlyOp() == true && !channel->isOperator( client ) )
 		{
-			std::string errMsg = ":ircserv 482 " + client.getNickname() + " " + channel->getName() + " :You're not channel operator\r\n";
+			std::string errMsg = ":" + _serverName + " 482 " + client.getNickname() + " " + channel->getName() + " :You're not channel operator\r\n";
 		    send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 			return ;
 		}

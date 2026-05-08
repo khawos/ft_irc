@@ -54,4 +54,6 @@ class Server {
 
 		bool	isUser( std::string userNickName );
 		User	*getUser( std::string nickname ) const;
+
+		bool	nickIsAlreadyTaken( std::string nick );
 };
