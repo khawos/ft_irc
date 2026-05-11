@@ -108,6 +108,28 @@ void	Server::disconnectClient( size_t pollIndex )
 	int fd = _pollFds[pollIndex].fd;
 	std::cout << "Client (fd=" << fd << ") disconnected from the server" << std::endl;
 
+	// Récupérer l'utilisateur avant de le supprimer
+	User *user = NULL;
+	if (_users.count(fd))
+		user = _users[fd];
+
+	// Retirer l'utilisateur de tous les canaux
+	if (user)
+	{
+		for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); )
+		{
+			it->second->deleteUserFromChannel(*user);
+			// Si le canal est vide, le supprimer
+			if (it->second->getNbUser() == 0)
+			{
+				delete it->second;
+				_channels.erase(it++);
+			}
+			else
+				++it;
+		}
+	}
+
 	// Fermer le socket
 	close(fd);
 

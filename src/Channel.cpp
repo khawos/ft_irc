@@ -33,6 +33,17 @@ void	Channel::deleteUserFromChannel( const User &userToDelete )
 		_Users.erase(name);
 	else
 		std::cerr << userToDelete.getNickname() << " is not a member of " << this->_name << '\n';
+
+	// Also remove from operators list if they were an operator
+	for (std::vector<User *>::iterator it = _operator.begin(); it != _operator.end(); )
+	{
+		if ((*it)->getFd() == userToDelete.getFd())
+			it = _operator.erase(it);
+		else
+			++it;
+	}
+
+	_nbUser--;
 }
 
 void	Channel::addToInviteList( const User &user )

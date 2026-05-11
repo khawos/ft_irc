@@ -36,7 +36,7 @@ void    Server::handlemode(User &client, Command cmd)
 		else if ( option == "+t" )
 			channel->setTopicIsOnlyOp( true );
 		else if ( option == "-k" || option == "+k" )
-		{	
+		{
 			if ( cmd.params.size() != 3 && option == "+k" )
 			{
 				// error
@@ -58,21 +58,23 @@ void    Server::handlemode(User &client, Command cmd)
 		}
 		else if (option == "-o" || option == "+o" )
 		{
-			if ( cmd.params.size() != 2 )
+			if ( cmd.params.size() != 3 )
 			{	
-				// error
+				std::string err = ":" + _serverName + " 461 " + client.getNickname() + " MODE :Not enough parameters\r\n";
+				send(client.getFd(), err.c_str(), err.size(), 0);
+				return ;
 			}
 			User *user = getUser( cmd.params[2] );
+			if ( !user )
+			{
+				std::string err = ":" + _serverName + " 401 " + client.getNickname() + " " + cmd.params[2] + " :No such nick\r\n";
+				send(client.getFd(), err.c_str(), err.size(), 0);
+				return ;
+			}
 			if ( option == "-o" )
-			{
-				if ( user )
-					channel->demoteOp( &client, user );
-			}
+				channel->demoteOp( &client, user );
 			else
-			{
-				if ( user )
-					channel->promoteOp( &client, user );
-			}
+				channel->promoteOp( &client, user );
 		}
 		else if ( option == "-l" || option == "+l" )
 		{
