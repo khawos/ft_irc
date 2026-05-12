@@ -73,24 +73,30 @@ void    Server::handleJoin(User &client, Command cmd)
 			send(client.getFd(), errMsg.c_str(), errMsg.length(), 0);
 			return ;
 		}
-		channel->addUserInChannel( _users[ client.getFd() ] );
-		channel->send_relay_message( client );
-		channel->incNbUSer();
-		sendNamesAfterJoin( client, channel );
+		if (_users.count(client.getFd()))
+		{
+			channel->addUserInChannel( _users[ client.getFd() ] );
+			channel->send_relay_message( client );
+			channel->incNbUSer();
+			sendNamesAfterJoin( client, channel );
+		}
 	}
 	catch( const std::exception& e )
 	{
-		std::cout << "New channel" << std::endl;
+		// std::cout << "New channel" << std::endl;
 		std::string pass = "";
 		if  ( cmd.params.size() > 1 )
 			pass = cmd.params[1];
 		std::string name = cmd.params[0];
 		Channel *channel = new Channel( &client, pass, name );
 		_channels[ name ] = channel;
-		channel->addUserInChannel( _users[ client.getFd() ] );
-		channel->incNbUSer();
-		channel->send_relay_message( client );
-		sendNamesAfterJoin( client, channel );
+		if (_users.count(client.getFd()))
+		{
+			channel->addUserInChannel( _users[ client.getFd() ] );
+			channel->incNbUSer();
+			channel->send_relay_message( client );
+			sendNamesAfterJoin( client, channel );
+		}
 	}
 }
 

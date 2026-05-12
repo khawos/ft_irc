@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     Server server( port, flag, password );
     if ( flag == -1 )
     {
-        std::cerr << "L'histoire de Corneille et Bernie" << std::endl;
+        // std::cerr << "L'histoire de Corneille et Bernie" << std::endl;
         return ( -1 );
     }
     server.runServer();

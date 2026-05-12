@@ -28,7 +28,7 @@ void	Server::handlePrivmsg(User &client, Command cmd)
 	std::string fullMsg = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getIp() +" PRIVMSG " + target + " :" + message + "\r\n";	
 	if (target[0] == '#')
 	{
-		std::cout << "Message : " << fullMsg << " Channel : " << target << std::endl;
+		// std::cout << "Message : " << fullMsg << " Channel : " << target << std::endl;
 		if ( _channels.find(target) == _channels.end() )
 		{
 			std::string err = ":server 403 " + client.getNickname() + " " + target + " :No such channel\r\n";

@@ -16,6 +16,5 @@ void    Server::handlePing(User &client, Command cmd)
     }
     std::string pongMsg = ":" + _serverName + " PONG " + _serverName + " " + token + "\r\n";
     send(client.getFd(), pongMsg.c_str(), pongMsg.length(), 0);
-	std::cout << "to (pong) : " << client.getFd() << std::endl;
-
+	// std::cout << "to (pong) : " << client.getFd() << std::endl;
 }

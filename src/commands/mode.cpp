@@ -26,7 +26,7 @@ void    Server::handlemode(User &client, Command cmd)
 			return ;
 		}
 		std::string	option = cmd.params[1];
-		std::cout << option << std::endl; 
+		// std::cout << option << std::endl; 
 		if ( option == "-i" )
 			channel->setInviteMode( false );
 		else if ( option == "+i")
@@ -94,7 +94,7 @@ void    Server::handlemode(User &client, Command cmd)
 	}
 	catch( const std::exception& e )
 	{
-		std::cout << " THROW" << std::endl;
+		// std::cout << " THROW" << std::endl;
 		// send( client.getFd(), "Use : MODE <channel> <flags>\n", 30, 0 );
 		// send( client.getFd(), "ERROR:MODE <channel> <flags>\n", 30, 0 );
 		return ;

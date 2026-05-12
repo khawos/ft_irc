@@ -29,10 +29,14 @@ void	Channel::deleteUserFromChannel( const User &userToDelete )
 	std::stringstream ss;
 	ss << userToDelete.getFd();
 	std::string	name = ss.str();
+	bool userWasRemoved = false;
 	if (_Users.count(name))
+	{
 		_Users.erase(name);
-	else
-		std::cerr << userToDelete.getNickname() << " is not a member of " << this->_name << '\n';
+		userWasRemoved = true;
+	}
+	// else
+		// std::cerr << userToDelete.getNickname() << " is not a member of " << this->_name << '\n';
 
 	// Also remove from operators list if they were an operator
 	for (std::vector<User *>::iterator it = _operator.begin(); it != _operator.end(); )
@@ -43,7 +47,8 @@ void	Channel::deleteUserFromChannel( const User &userToDelete )
 			++it;
 	}
 
-	_nbUser--;
+	if (userWasRemoved)
+		_nbUser--;
 }
 
 void	Channel::addToInviteList( const User &user )
@@ -76,16 +81,16 @@ const std::map<std::string, User*> &Channel::getUserMap() const
 void	Channel::sendMessage( const std::string &msg, User client ) const
 {
 	const std::map<std::string, User*>	&_User = getUserMap();
-	std::cout << "Send in" << std::endl;
+	// std::cout << "Send in" << std::endl;
 	for ( std::map<std::string, User*>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
 		if ( it->second->getNickname() != client.getNickname() )
 		{
 			send(it->second->getFd(), msg.c_str(), msg.size(), 0);
-			std::cout << "to : " << it->second->getFd() << std::endl;
+			// std::cout << "to : " << it->second->getFd() << std::endl;
 		}
 	}
-	std::cout << "Send out" << std::endl;
+	// std::cout << "Send out" << std::endl;
 }
 
 void	Channel::sendMessage_broadcast( const std::string &msg ) const
@@ -94,7 +99,7 @@ void	Channel::sendMessage_broadcast( const std::string &msg ) const
 	for ( std::map<std::string, User*>::const_iterator it = _User.begin(); it != _User.end(); it++ )
 	{
 		send(it->second->getFd(), msg.c_str(), msg.size(), 0);
-		std::cout << "to : " << it->second->getFd() << std::endl;
+		// std::cout << "to : " << it->second->getFd() << std::endl;
 	}
 }
 

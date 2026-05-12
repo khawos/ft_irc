@@ -13,7 +13,7 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 	_socketFD = socket(AF_INET, SOCK_STREAM, 0); // create a socket
 	if (_socketFD == -1)
 	{
-		std::cerr << "(Server Socket) Socket initialization failed." << std::endl;
+		// std::cerr << "(Server Socket) Socket initialization failed." << std::endl;
 		flag = -1;
 		return ;
 	}
@@ -28,7 +28,7 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 	int	bind_return_value = bind( _socketFD, ( const sockaddr *) &socketAddr, sizeof(socketAddr));
 	if ( bind_return_value == -1 )
 	{
-		std::cerr << "(Server Socket) Bind failed to set port " << _port << " as active listening" << std::endl;
+		// std::cerr << "(Server Socket) Bind failed to set port " << _port << " as active listening" << std::endl;
 		flag = -1;
 		return ;
 	}
@@ -36,7 +36,7 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 	int	listen_return_value = listen( _socketFD, 1024 ); // backlog = 1024 (PAS le port !)
 	if (listen_return_value == -1)
 	{
-		std::cerr << "(Server Socket) Listen failed to mark _socketFD." << std::endl;
+		// std::cerr << "(Server Socket) Listen failed to mark _socketFD." << std::endl;
 		flag = -1;
 		return ;
 	}
@@ -71,6 +71,8 @@ void	Server::runServer()
 		poll( _pollFds.data(), _pollFds.size(), -1 );
 		for (size_t i = 0; i < _pollFds.size(); i++)
 		{
+			if (i >= _pollFds.size())
+				break;
 			if ( _pollFds[i].revents & POLLIN )
 			{
 				if (_pollFds[i].fd == _socketFD)
@@ -83,8 +85,8 @@ void	Server::runServer()
 						std::string ip = inet_ntoa(clientAddr.sin_addr);	// Convertir l'adresse IPv4 en string
 						_users[client_fd] = newUserConnexion(client_fd, ip);
 					}
-					else
-						std::cerr << "Accept failed" << std::endl;
+					// else
+						// std::cerr << "Accept failed" << std::endl;
 				}
 				else
 				{
@@ -105,8 +107,13 @@ void	Server::runServer()
 // (l'index suffit puisqu'on a accès à _pollFds[id].fd pour retrouver le User)
 void	Server::disconnectClient( size_t pollIndex )
 {
+	if (pollIndex >= _pollFds.size())
+		return;
+	
 	int fd = _pollFds[pollIndex].fd;
-	std::cout << "Client (fd=" << fd << ") disconnected from the server" << std::endl;
+	if (fd == -1)
+		return;
+	// std::cout << "Client (fd=" << fd << ") disconnected from the server" << std::endl;
 
 	// Récupérer l'utilisateur avant de le supprimer
 	User *user = NULL;
@@ -140,13 +147,14 @@ void	Server::disconnectClient( size_t pollIndex )
 		_users.erase(fd);
 	}
 
-	// Enlever du _pollFds
-	_pollFds.erase(_pollFds.begin() + pollIndex);
+	// Marquer comme fermé au lieu d'effacer tout de suite
+	if (pollIndex < _pollFds.size())
+		_pollFds[pollIndex].fd = -1;
 }
 
 User	*Server::newUserConnexion( int client_fd, const std::string &ip )
 {
-	std::cout << "New client connected! (fd=" << client_fd << ", ip=" << ip << ")" << std::endl;
+	// std::cout << "New client connected! (fd=" << client_fd << ", ip=" << ip << ")" << std::endl;
 
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
@@ -178,7 +186,7 @@ void	Server::handleUserData(size_t pollIndex)
 	// Récupérer le User par son fd (clé stable)
 	if (!_users.count(fd))
 	{
-		std::cerr << "No user found for fd " << fd << std::endl;
+		// std::cerr << "No user found for fd " << fd << std::endl;
 		return;
 	}
 	User *user = _users[fd];
@@ -198,20 +206,26 @@ void	Server::processCommand(User& client, const std::string& line)
 	if (cmd.name.empty())
 		return;
 
-	std::cout << "[PARSED] name=" << cmd.name << " params=";
-	for (size_t i = 0; i < cmd.params.size(); i++)
+	 std::cout << "[PARSED] name=" << cmd.name << " params=";
+	 for (size_t i = 0; i < cmd.params.size(); i++)
 		std::cout << "[" << cmd.params[i] << "] ";
-	std::cout << std::endl;
+	 std::cout << std::endl;
 
 	// Dispatcher
 
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
+	else if (!client.isPassOk())
+	{
+		std::string err = ":" + _serverName + " 464 * :Password required\r\n";
+		send(client.getFd(), err.c_str(), err.length(), 0);
+		return ;
+	}
  	else if (cmd.name == "NICK")
  		handleNick(client, cmd);
 	else if (cmd.name == "USER")
 		handleUsername(client, cmd);
-	else if (!client.isRegistered() && client.isPassOk() != true )
+	else if (!client.isRegistered())
 	{
 		return ;
 	}
