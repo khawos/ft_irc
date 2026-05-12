@@ -27,33 +27,58 @@ void    Server::handlemode(User &client, Command cmd)
 		}
 		std::string	option = cmd.params[1];
 		// std::cout << option << std::endl; 
+		std::string prefix = client.getNickname() + "!" + client.getUsername() + "@" + client.getIp();
 		if ( option == "-i" )
+		{
 			channel->setInviteMode( false );
+			std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " -i\r\n";
+			channel->sendMessage_broadcast(broadcastMsg);
+		}
 		else if ( option == "+i")
+		{
 			channel->setInviteMode( true );
+			std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " +i\r\n";
+			channel->sendMessage_broadcast(broadcastMsg);
+		}
 		else if ( option == "-t" )
+		{
 			channel->setTopicIsOnlyOp( false );
+			std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " -t\r\n";
+			channel->sendMessage_broadcast(broadcastMsg);
+		}
 		else if ( option == "+t" )
+		{
 			channel->setTopicIsOnlyOp( true );
+			std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " +t\r\n";
+			channel->sendMessage_broadcast(broadcastMsg);
+		}
 		else if ( option == "-k" || option == "+k" )
 		{
 			if ( cmd.params.size() != 3 && option == "+k" )
 			{
-				// error
+				std::string err = ":" + _serverName + " 461 " + client.getNickname() + " MODE :Not enough parameters\r\n";
+				send(client.getFd(), err.c_str(), err.size(), 0);
+				return ;
 			}
 			else if ( cmd.params.size() == 3 && option == "+k" )
 			{
 				channel->setPassword( cmd.params[2] );
 				channel->setKey( true );
+				std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " +k " + cmd.params[2] + "\r\n";
+				channel->sendMessage_broadcast(broadcastMsg);
 			}
 			else if ( cmd.params.size() != 2 && option == "-k" )
 			{
-				// error
+				std::string err = ":" + _serverName + " 461 " + client.getNickname() + " MODE :Not enough parameters\r\n";
+				send(client.getFd(), err.c_str(), err.size(), 0);
+				return ;
 			}
 			else
 			{
 				channel->setPassword("");
-				channel->setKey( false );			
+				channel->setKey( false );
+				std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " -k\r\n";
+				channel->sendMessage_broadcast(broadcastMsg);			
 			}
 		}
 		else if (option == "-o" || option == "+o" )
@@ -81,14 +106,20 @@ void    Server::handlemode(User &client, Command cmd)
 			if ( option == "+l" && cmd.params.size() == 3 )
 			{
 				channel->setUserLimit( std::atoi( cmd.params[2].c_str() ) );
+				std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " +l " + cmd.params[2] + "\r\n";
+				channel->sendMessage_broadcast(broadcastMsg);
 			}
 			else if ( option == "-l" && cmd.params.size() == 2 )
 			{
 				channel->setUserLimit( 0 );
+				std::string broadcastMsg = ":" + prefix + " MODE " + channel->getName() + " -l\r\n";
+				channel->sendMessage_broadcast(broadcastMsg);
 			}
 			else
 			{
-				// error
+				std::string err = ":" + _serverName + " 461 " + client.getNickname() + " MODE :Not enough parameters\r\n";
+				send(client.getFd(), err.c_str(), err.size(), 0);
+				return ;
 			}
 		}
 	}

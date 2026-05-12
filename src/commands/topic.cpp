@@ -46,7 +46,7 @@ void    Server::handletopic( User &client, Command cmd )
 		channel->setTopic( cmd.params[1] );
 		std::string prefix = client.getNickname() + "!" + client.getUsername() + "@" + client.getIp();
 		std::string broadcastMsg = ":" + prefix + " TOPIC " + channel->getName() + " :" + channel->getTopic() + "\r\n";
-		channel->sendMessage( broadcastMsg, client );
+		channel->sendMessage_broadcast( broadcastMsg );
 	}
 	catch( std::exception &e )
 	{
