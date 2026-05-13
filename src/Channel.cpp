@@ -3,7 +3,7 @@
 
 Channel::Channel(){}
 
-Channel::Channel( User *op, std::string pass, std::string name) : _name(name), _topic(""), _inviteMode(false), _topicIsOnlyOP(false)
+Channel::Channel( User *op, std::string pass, std::string name) : _name(name), _topic(""), _limit_user(0), _inviteMode(false), _topicIsOnlyOP(false)
 {
 	_nbUser = 0;
 	_password = pass;
