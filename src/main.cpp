@@ -1,6 +1,8 @@
 #include "../includes/Server.hpp"
 #include <iostream>
 
+void * server_global;
+
 int main(int argc, char **argv)
 {
     if (argc != 3)
@@ -12,11 +14,13 @@ int main(int argc, char **argv)
 	int port = std::atoi(argv[1]);
     std::string password( argv[2] );
     Server server( port, flag, password );
+    server_global = &server;
     if ( flag == -1 )
     {
         // std::cerr << "L'histoire de Corneille et Bernie" << std::endl;
         return ( -1 );
     }
     server.runServer();
+    std::cout << "awerwer" << std::endl;
     return 0;
 }
