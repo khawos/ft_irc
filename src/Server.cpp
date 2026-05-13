@@ -213,6 +213,13 @@ void	Server::processCommand(User& client, const std::string& line)
 
 	// Dispatcher
 
+	if ( cmd.name == "CAP" )
+	{
+    		// On dit à Irssi qu'on ne supporte aucune option avancée
+    		std::string reply = "CAP * LS :\r\n";
+    		send(client.getFd(), reply.c_str(), reply.length(), 0);
+    		return ; // Très important, on s'arrête là pour cette commande
+	}
 	if (cmd.name == "PASS")
 		handlePass(client, cmd);
 	else if (!client.isPassOk())
