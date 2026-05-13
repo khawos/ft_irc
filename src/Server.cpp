@@ -1,13 +1,51 @@
 #include "../includes/Server.hpp"
 #include <arpa/inet.h>
 
-Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _port(port), _password(password)
+void	Server::handle_sigint(int sig, siginfo_t *info, void *test)
+{
+	(void)test;
+	(void)sig;
+	(void)info;
+	
+	Server *ptr = static_cast<Server *>(server_global);
+	ptr->running = false;
+
+	// for (std::map<int, User*>::iterator it = ptr->_users.begin(); it != ptr->_users.end(); ++it)
+	// {
+	// 	close(it->first);
+	// 	delete it->second;
+	// }
+	// ptr->_users.clear();
+	// for (std::map<std::string, Channel*>::iterator it = ptr->_channels.begin(); it != ptr->_channels.end(); ++it)
+	// 	delete it->second;
+	// ptr->_channels.clear();
+	// if (ptr->_socketFD != -1)
+	// 	close(ptr->_socketFD);
+
+}
+
+void	Server::signal_handler(void)
+{
+	struct sigaction	sa;
+
+	sa.sa_sigaction = handle_sigint;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _port(port), _password(password), running(true)
 {
 	struct	sockaddr_in	socketAddr;
 	std::memset(&socketAddr, 0, sizeof(socketAddr));
 	socketAddr.sin_family = AF_INET;
 	socketAddr.sin_port = htons(_port); 		// htons is for big endian standard imposed by TCP/IP
 	socketAddr.sin_addr.s_addr = INADDR_ANY;
+
 
 	_serverName = "ircserv";
 	_socketFD = socket(AF_INET, SOCK_STREAM, 0); // create a socket
@@ -17,6 +55,8 @@ Server::Server( int port, int &flag, std::string password ) : _socketFD(-1), _po
 		flag = -1;
 		return ;
 	}
+
+	signal_handler();
 
 	// SO_REUSEADDR pour pouvoir relancer le serveur sans attendre
 	int opt = 1;
@@ -65,7 +105,6 @@ Server::~Server()
 
 void	Server::runServer()
 {
-	bool			running = true;
 	while ( running )
 	{
 		poll( _pollFds.data(), _pollFds.size(), -1 );

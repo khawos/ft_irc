@@ -11,7 +11,10 @@
 # include <map> // std::map
 # include "../includes/User.hpp" // User Class - std::string
 # include "../includes/Channel.hpp" // Channel Class 
+# include <signal.h> // sigaction()
 # include "../includes/Command.hpp" // Command struct - std::string, std::vector<std::string>
+
+extern void* server_global;
 
 class Server {
 
@@ -24,12 +27,16 @@ class Server {
 		std::map<std::string, Channel *>		_channels;
 		std::string								_password;	
 		std::string								_serverName;
+		bool 									running;
+
 	
 	public:
 
 		Server();
 		Server( int, int &, std::string );
 		~Server();
+		static void	handle_sigint(int sig, siginfo_t *info, void *test);
+		void	signal_handler(void);
 		User	*newUserConnexion( int client_fd, const std::string &ip );
 		void	runServer();
 		void	handleCommand( std::string, std::vector<std::string>, int );
